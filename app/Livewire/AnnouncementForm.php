@@ -3,8 +3,10 @@
 namespace App\Livewire;
 
 use App\Models\Announcement;
+use App\Models\User;
 use App\Models\Zone;
 use App\Services\AnnouncementDeliveryService;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -21,8 +23,23 @@ class AnnouncementForm extends Component
 
     public string $deliveryMessage = '';
 
+    public ?int $deletedAnnouncementId = null;
+
+    public function mount(): void
+    {
+        $user = auth()->user();
+
+        if ($user->role === 'agent') {
+            $this->zoneId = $user->zone_id;
+        }
+    }
+
     public function publish(AnnouncementDeliveryService $delivery): void
     {
+        if (auth()->user()->role === 'agent') {
+            $this->zoneId = auth()->user()->zone_id;
+        }
+
         $this->validate([
             'title' => ['required', 'string', 'max:200'],
             'content' => ['required', 'string'],
@@ -48,14 +65,75 @@ class AnnouncementForm extends Component
             default => "Annonce publiée dans l'espace membre. Aucun appareil n'a encore activé les notifications.",
         };
 
-        $this->reset(['title', 'content', 'zoneId']);
+        $this->reset(['title', 'content']);
+
+        if (auth()->user()->role === 'admin') {
+            $this->zoneId = null;
+        }
+
         $this->published = true;
+    }
+
+    public function delete(int $announcementId): void
+    {
+        $announcement = $this->announcementQuery()
+            ->whereKey($announcementId)
+            ->firstOrFail();
+
+        $announcement->delete();
+        $this->deletedAnnouncementId = $announcementId;
     }
 
     public function render()
     {
+        $announcements = $this->announcementQuery()
+            ->with(['author', 'zone'])
+            ->latest('published_at')
+            ->latest('id')
+            ->get()
+            ->map(function (Announcement $announcement) {
+                $targetUsersQuery = $this->targetUsersQuery($announcement);
+
+                $announcement->target_clients_count = (clone $targetUsersQuery)->count();
+                $announcement->target_clients_preview = (clone $targetUsersQuery)
+                    ->orderBy('name')
+                    ->limit(3)
+                    ->pluck('name')
+                    ->all();
+
+                return $announcement;
+            });
+
         return view('livewire.announcement-form', [
-            'zones' => Zone::orderBy('name')->get(),
+            'zones' => $this->zonesQuery()->get(),
+            'announcements' => $announcements,
         ]);
+    }
+
+    protected function announcementQuery(): Builder
+    {
+        $user = auth()->user();
+
+        return Announcement::query()
+            ->when($user->role === 'agent', function (Builder $query) use ($user) {
+                $query->where('created_by', $user->id);
+            });
+    }
+
+    protected function zonesQuery(): Builder
+    {
+        $user = auth()->user();
+
+        return Zone::query()
+            ->when($user->role === 'agent', fn (Builder $query) => $query->whereKey($user->zone_id))
+            ->orderBy('name');
+    }
+
+    protected function targetUsersQuery(Announcement $announcement): Builder
+    {
+        return User::query()
+            ->where('role', 'client')
+            ->where('is_active', true)
+            ->when($announcement->zone_id, fn (Builder $query) => $query->where('zone_id', $announcement->zone_id));
     }
 }

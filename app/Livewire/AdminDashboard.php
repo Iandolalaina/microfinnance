@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Loan;
+use App\Models\LoanSchedule;
 use App\Models\Schedule;
 use App\Models\User;
 use App\Models\Zone;
@@ -18,13 +19,13 @@ class AdminDashboard extends Component
         $totalClients = User::where('role', 'client')->count();
         $totalAgents = User::where('role', 'agent')->count();
         $totalLoansAmount = Loan::where('status', 'active')->sum('amount');
-        $totalRepaid = Schedule::sum('amount_paid');
-        $totalDue = Schedule::sum('amount_due');
+        $totalRepaid = Schedule::sum('amount_paid') + LoanSchedule::sum('amount_paid');
+        $totalDue = Schedule::sum('amount_due') + LoanSchedule::sum('amount_due');
         $totalRemaining = $totalDue - $totalRepaid;
 
         // Répartition des échéances (même logique que le dashboard agent,
         // mais sans filtrer par zone cette fois)
-        $schedules = Schedule::all();
+        $schedules = Schedule::all()->concat(LoanSchedule::all());
         $stats = [
             'paid' => $schedules->where('effective_status', 'paid')->count(),
             'pending' => $schedules->where('effective_status', 'pending')->count(),
@@ -35,6 +36,10 @@ class AdminDashboard extends Component
         $zones = Zone::withCount(['users as clients_count' => function ($query) {
             $query->where('role', 'client');
         }])->get();
+        $pendingLoans = Loan::with(['client', 'type', 'group'])
+            ->where('status', 'pending')
+            ->latest()
+            ->get();
 
         return view('livewire.admin-dashboard', [
             'totalClients' => $totalClients,
@@ -44,6 +49,7 @@ class AdminDashboard extends Component
             'totalRemaining' => $totalRemaining,
             'stats' => $stats,
             'zones' => $zones,
+            'pendingLoans' => $pendingLoans,
         ]);
     }
 }

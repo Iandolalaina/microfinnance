@@ -13,6 +13,7 @@ class Payment extends Model
     protected $fillable = [
         'loan_id',
         'schedule_id',
+        'loan_schedule_id',
         'user_id',
         'agent_id',
         'amount',
@@ -46,6 +47,11 @@ class Payment extends Model
     public function schedule(): BelongsTo
     {
         return $this->belongsTo(Schedule::class);
+    }
+
+    public function loanSchedule(): BelongsTo
+    {
+        return $this->belongsTo(LoanSchedule::class);
     }
 
     /**

@@ -25,6 +25,14 @@
         .brand-caption { display: block; margin-top: 2px; color: #72817a; font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
         .nav-links { display: flex; align-items: center; gap: 28px; color: #4f615a; font-size: 13px; font-weight: 600; }
         .nav-links a:hover, .text-link:hover { color: var(--mitsinjo-blue); }
+        .services-menu { position: relative; }
+        .services-menu summary { cursor: pointer; list-style: none; }
+        .services-menu summary::-webkit-details-marker { display: none; }
+        .services-menu summary::after { margin-left: 5px; content: '▾'; }
+        .services-dropdown { position: absolute; top: calc(100% + 12px); left: -16px; z-index: 5; min-width: 170px; padding: 7px; border: 1px solid #e7ede8; border-radius: 6px; background: #fff; box-shadow: 0 12px 30px rgb(24 43 53 / 12%); }
+        .services-dropdown a { display: block; padding: 10px 12px; border-radius: 4px; }
+        .services-dropdown a:hover { background: #edf3ef; }
+        .mobile-services { display: none; }
         .nav-cta, .button-primary, .button-outline { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 20px; border-radius: 4px; font-size: 13px; font-weight: 700; transition: transform .2s ease, background .2s ease; }
         .nav-cta, .button-primary { color: #fff; background: var(--mitsinjo-blue); }
         .nav-cta:hover, .button-primary:hover { background: #034b82; transform: translateY(-2px); }
@@ -74,6 +82,12 @@
             .brand img { width: 42px; height: 42px; }
             .brand-name { font-size: 16px; }
             .nav-links { display: none; }
+            .mobile-services { display: block; padding: 0 18px 12px; color: #4f615a; font-size: 13px; font-weight: 600; }
+            .mobile-services summary { cursor: pointer; list-style: none; }
+            .mobile-services summary::-webkit-details-marker { display: none; }
+            .mobile-services summary::after { margin-left: 5px; content: '▾'; }
+            .mobile-services .services-dropdown { position: static; display: flex; gap: 8px; margin-top: 8px; padding: 0; border: 0; box-shadow: none; }
+            .mobile-services .services-dropdown a { padding: 8px 12px; background: #edf3ef; }
             .nav-cta { min-height: 40px; padding: 0 14px; font-size: 12px; }
             .hero-inner { width: min(100% - 36px, 620px); grid-template-columns: 1fr; gap: 32px; padding: 54px 0 46px; }
             .hero h1 { max-width: 520px; font-size: 46px; }
@@ -113,12 +127,25 @@
             </a>
             <div class="nav-links">
                 <a href="#accueil">Accueil</a>
-                <a href="#services">Nos services</a>
+                <details class="services-menu">
+                    <summary>Nos services</summary>
+                    <div class="services-dropdown">
+                        <a href="{{ route('savings.index') }}">Épargne</a>
+                        <a href="{{ route('credits.index') }}">Crédit</a>
+                    </div>
+                </details>
                 <a href="#engagement">Notre engagement</a>
                 <a href="{{ route('register') }}">Devenir membre</a>
             </div>
             <a class="nav-cta" href="{{ $dashboardUrl }}">{{ auth()->check() ? 'Mon espace' : 'Se connecter' }}</a>
         </nav>
+        <details class="mobile-services">
+            <summary>Nos services</summary>
+            <div class="services-dropdown">
+                <a href="{{ route('savings.index') }}">Épargne</a>
+                <a href="{{ route('credits.index') }}">Crédit</a>
+            </div>
+        </details>
     </header>
 
     <main>
@@ -154,7 +181,7 @@
                     <p>Des outils conçus pour faciliter le suivi des financements et des remboursements.</p>
                 </div>
                 <div class="service-list">
-                    <article class="service-item"><span class="service-number">01 / FINANCEMENT</span><h3>Des projets accompagnés</h3><p>Un suivi de crédit organisé pour aider les clients à garder le cap sur leurs objectifs.</p></article>
+                    <article class="service-item"><span class="service-number">01 / FINANCEMENT</span><h3><a href="{{ route('credits.index') }}">Des projets accompagnés</a></h3><p>Un suivi de crédit organisé pour aider les clients à garder le cap sur leurs objectifs.</p></article>
                     <article class="service-item"><span class="service-number">02 / SUIVI</span><h3>Une vision claire</h3><p>Retrouvez les montants, les échéances et l’avancement de vos remboursements dans votre espace.</p></article>
                     <article class="service-item"><span class="service-number">03 / PROXIMITÉ</span><h3>Un lien avec votre agent</h3><p>Les agents assurent le suivi sur le terrain et vous accompagnent dans vos démarches.</p></article>
                 </div>

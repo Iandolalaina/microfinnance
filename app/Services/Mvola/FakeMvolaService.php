@@ -17,7 +17,7 @@ class FakeMvolaService implements MvolaServiceInterface
         // Ici on simule simplement un succès systématique.
         return [
             'status' => 'pending',
-            'serverCorrelationId' => 'FAKE-' . Str::upper(Str::random(12)),
+            'serverCorrelationId' => Str::upper(Str::random(12)),
         ];
     }
 }

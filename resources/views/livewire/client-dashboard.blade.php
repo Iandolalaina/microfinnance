@@ -12,6 +12,9 @@
             <p class="text-sm text-gray-500">Bonjour,</p>
             <h1 class="text-lg font-semibold text-gray-900">{{ auth()->user()->name }}</h1>
         </div>
+        <a href="{{ url('/client/loans/create') }}" class="rounded-lg bg-brand-600 px-3 py-2 text-xs font-semibold text-white hover:bg-brand-700">
+            Demander un crédit
+        </a>
         <form method="POST" action="{{ url('/logout') }}">
             @csrf
             <button type="submit" class="text-sm text-gray-400 hover:text-red-600">
@@ -25,6 +28,16 @@
             <p class="text-sm font-medium text-green-800">Votre inscription est confirmée. Voici votre matricule :</p>
             <p class="mt-1 text-lg font-bold text-green-900">{{ session('member_matricule') }}</p>
             <p class="mt-1 text-xs text-green-700">Gardez-le pour vous connecter à votre espace.</p>
+        </div>
+    @endif
+
+    @if ($pendingLoan)
+        <div class="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800" role="status">
+            Votre demande de crédit {{ $pendingLoan->type?->name }} de {{ number_format($pendingLoan->amount, 0, ',', ' ') }} Ar est en cours d’examen.
+        </div>
+    @elseif ($rejectedLoan)
+        <div class="mb-5 rounded-xl border border-gray-200 bg-white p-4 text-sm text-gray-700" role="status">
+            Votre dernière demande de crédit a été refusée. Vous pouvez contacter votre agent pour en connaître le motif ou déposer une nouvelle demande.
         </div>
     @endif
 
@@ -106,7 +119,9 @@
                             à régler avant le {{ \Carbon\Carbon::parse($next->due_date)->translatedFormat('d F Y') }}
                         </p>
                     </div>
-                    <a href="{{ url('/client/payment/' . $next->id) }}"
+                    <a href="{{ $next instanceof \App\Models\LoanSchedule
+                        ? url('/client/loan-payment/' . $next->id)
+                        : url('/client/payment/' . $next->id) }}"
                        class="bg-brand-600 hover:bg-brand-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl">
                         Payer
                     </a>
@@ -130,13 +145,13 @@
 
                     {{-- Badge de statut coloré selon l'état de l'échéance --}}
                     @php
-                        $badgeClasses = match($schedule->status) {
+                        $badgeClasses = match($schedule->effective_status) {
                             'paid' => 'bg-green-100 text-green-700',
                             'late' => 'bg-red-100 text-red-700',
                             'partial' => 'bg-amber-100 text-amber-700',
                             default => 'bg-gray-100 text-gray-600',
                         };
-                        $badgeLabel = match($schedule->status) {
+                        $badgeLabel = match($schedule->effective_status) {
                             'paid' => 'Payé',
                             'late' => 'En retard',
                             'partial' => 'Partiel',

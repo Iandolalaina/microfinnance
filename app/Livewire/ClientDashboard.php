@@ -3,7 +3,6 @@
 namespace App\Livewire;
 
 use App\Models\Announcement;
-use App\Models\Loan;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -25,11 +24,23 @@ class ClientDashboard extends Component
             ->where('status', 'active')
             ->latest()
             ->first();
+        $pendingLoan = auth()->user()->loans()
+            ->where('status', 'pending')
+            ->with('type')
+            ->latest()
+            ->first();
+        $rejectedLoan = auth()->user()->loans()
+            ->where('status', 'rejected')
+            ->with('type')
+            ->latest()
+            ->first();
 
         // On récupère aussi TOUTES les échéances de ce prêt, triées par date,
         // uniquement si un prêt actif existe (sinon collection vide).
         $schedules = $loan
-            ? $loan->schedules()->orderBy('due_date')->get()
+            ? ($loan->loanSchedules()->exists()
+                ? $loan->loanSchedules()->orderBy('due_date')->get()
+                : $loan->schedules()->orderBy('due_date')->get())
             : collect();
 
         $announcements = Announcement::visibleTo(auth()->user())
@@ -41,6 +52,8 @@ class ClientDashboard extends Component
 
         return view('livewire.client-dashboard', [
             'loan' => $loan,
+            'pendingLoan' => $pendingLoan,
+            'rejectedLoan' => $rejectedLoan,
             'schedules' => $schedules,
             'announcements' => $announcements,
         ]);

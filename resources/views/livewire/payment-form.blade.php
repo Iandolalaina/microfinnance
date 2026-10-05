@@ -15,6 +15,12 @@
             <p class="text-sm text-gray-500 mb-5">
                 Échéance du {{ \Carbon\Carbon::parse($schedule->due_date)->translatedFormat('d F Y') }}
             </p>
+            <div class="bg-brand-50 rounded-xl p-4 text-center mb-5">
+                <p class="text-xs text-brand-600 uppercase tracking-wide mb-1">Montant à payer</p>
+                <p class="text-2xl font-bold text-brand-700">
+                    {{ number_format($schedule->amount_due - $schedule->amount_paid, 0, ',', ' ') }} Ar
+                </p>
+            </div>
 
             <div class="bg-brand-50 rounded-xl p-4 text-center mb-5">
                 <p class="text-xs text-brand-600 uppercase tracking-wide mb-1">Montant à payer</p>
@@ -38,9 +44,6 @@
                     @error('mvolaPhone')
                         <p class="text-red-600 text-xs mt-1">{{ $message }}</p>
                     @enderror
-                    <p class="text-xs text-gray-400 mt-1.5">
-                        Mode simulation : utilisez n'importe quel numéro à 10 chiffres pour tester.
-                    </p>
                 </div>
 
                 <button
@@ -60,16 +63,22 @@
             <div class="mx-auto h-14 w-14 rounded-full bg-green-100 flex items-center justify-center mb-4">
                 <span class="text-green-600 text-2xl">✓</span>
             </div>
-            <h1 class="text-lg font-semibold text-gray-900 mb-1">Paiement confirmé</h1>
-            <p class="text-sm text-gray-500 mb-5">
-                {{ number_format($lastPayment->amount, 0, ',', ' ') }} Ar ont été enregistrés avec succès.
-            </p>
-
-            <a href="{{ url('/client/receipts/' . $lastPayment->id) }}"
-               target="_blank"
-               class="block w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-3 rounded-xl mb-3">
-                Télécharger le reçu (PDF)
-            </a>
+            @if ($lastPayment->status === 'confirmed')
+                <h1 class="text-lg font-semibold text-gray-900 mb-1">Paiement confirmé</h1>
+                <p class="text-sm text-gray-500 mb-5">
+                    {{ number_format($lastPayment->amount, 0, ',', ' ') }} Ar ont été enregistrés avec succès.
+                </p>
+                <a href="{{ url('/client/receipts/' . $lastPayment->id) }}"
+                   target="_blank"
+                   class="mb-3 block w-full rounded-xl bg-brand-600 py-3 font-medium text-white hover:bg-brand-700">
+                    Télécharger le reçu (PDF)
+                </a>
+            @else
+                <h1 class="text-lg font-semibold text-gray-900 mb-1">Demande de paiement envoyée</h1>
+                <p class="mb-5 text-sm text-gray-500">
+                    {{ number_format($lastPayment->amount, 0, ',', ' ') }} Ar sont en attente de confirmation par Mvola.
+                </p>
+            @endif
 
             <a href="{{ url('/client/dashboard') }}"
                class="block w-full text-gray-500 text-sm py-2">

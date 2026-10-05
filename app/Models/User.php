@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -84,6 +85,23 @@ class User extends Authenticatable
     public function loansManaged(): HasMany
     {
         return $this->hasMany(Loan::class, 'agent_id');
+    }
+
+    public function loansReviewed(): HasMany
+    {
+        return $this->hasMany(Loan::class, 'reviewed_by');
+    }
+
+    public function solidarityGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(Group::class)
+            ->withPivot(['role', 'joined_at'])
+            ->withTimestamps();
+    }
+
+    public function groupsCreated(): HasMany
+    {
+        return $this->hasMany(Group::class, 'created_by');
     }
 
     /**

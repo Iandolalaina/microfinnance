@@ -49,10 +49,10 @@
                 {{ $payment->method === 'mvola' ? 'Mvola' : ($payment->method === 'cash' ? 'Espèces' : 'Autre') }}
             </td>
         </tr>
-        @if($payment->mvola_transaction_id)
+        @if($payment->mvola_transaction_id && $payment->method === 'mvola')
         <tr>
             <td class="label">Référence transaction</td>
-            <td class="value">{{ $payment->mvola_transaction_id }}</td>
+            <td class="value">{{ \Illuminate\Support\Str::replaceFirst('FAKE-', '', $payment->mvola_transaction_id) }}</td>
         </tr>
         @endif
         <tr>

@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Storage;
 
 class PaymentConfirmationService
 {
+    public function __construct(private LoanService $loanService) {}
+
     /**
      * Confirme un versement, applique son montant sur les echeances, genere
      * le recu PDF, puis declenche le SMS de confirmation via evenement.
@@ -33,6 +35,11 @@ class PaymentConfirmationService
 
             if ($lockedPayment->schedule_id) {
                 $this->applyPaymentToSchedules($lockedPayment);
+            } elseif ($lockedPayment->loan_schedule_id) {
+                $this->loanService->applyPayment(
+                    $lockedPayment->loanSchedule,
+                    (float) $lockedPayment->amount
+                );
             }
 
             return [$lockedPayment, false];
@@ -86,6 +93,7 @@ class PaymentConfirmationService
             if ($remainingDue <= 0) {
                 $schedule->status = 'paid';
                 $schedule->save();
+
                 continue;
             }
 
@@ -108,13 +116,13 @@ class PaymentConfirmationService
      */
     protected function generateReceiptPdf(Payment $payment): string
     {
-        $payment->loadMissing(['client', 'loan', 'schedule']);
+        $payment->loadMissing(['client', 'loan', 'schedule', 'loanSchedule']);
 
         $pdf = Pdf::loadView('pdf.receipt', [
             'payment' => $payment,
         ]);
 
-        $filename = 'receipts/recu-' . $payment->id . '-' . now()->timestamp . '.pdf';
+        $filename = 'receipts/recu-'.$payment->id.'-'.now()->timestamp.'.pdf';
 
         Storage::disk('public')->put($filename, $pdf->output());
 

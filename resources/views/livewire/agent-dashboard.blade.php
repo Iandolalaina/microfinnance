@@ -13,8 +13,11 @@
         </div>
         <div class="flex items-center gap-4">
             <a href="{{ route('home') }}" class="text-sm text-gray-500 hover:text-brand-600">Accueil</a>
+            <a href="{{ url('/agent/loans/create') }}" class="text-sm text-brand-600 hover:underline">
+                Octroyer un pret
+            </a>
             <a href="{{ url('/agent/announcements') }}" class="text-sm text-brand-600 hover:underline">
-                Publier une annonce
+                Gerer les annonces
             </a>
             <form method="POST" action="{{ url('/logout') }}">
                 @csrf
@@ -22,6 +25,31 @@
             </form>
         </div>
     </div>
+
+    <section class="mb-8" aria-labelledby="pending-loans-heading">
+        <h2 id="pending-loans-heading" class="mb-3 text-sm font-semibold text-gray-700">
+            Demandes de crédit à examiner ({{ $pendingLoans->count() }})
+        </h2>
+        <div class="space-y-3">
+            @forelse ($pendingLoans as $loan)
+                <article wire:key="agent-loan-request-{{ $loan->id }}" class="rounded-xl border border-amber-100 bg-white p-4 shadow-sm">
+                    <div class="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                            <p class="font-semibold text-gray-900">{{ $loan->client->name }} — {{ $loan->type?->name }}</p>
+                            <p class="mt-1 text-sm text-gray-600">{{ number_format($loan->amount, 0, ',', ' ') }} Ar · {{ $loan->duration_months }} mois · {{ $loan->repayment_frequency }}</p>
+                            <p class="mt-1 text-sm text-gray-500">{{ $loan->purpose }}</p>
+                            @if ($loan->group)
+                                <p class="mt-1 text-xs text-gray-500">Groupe : {{ $loan->group->name }}</p>
+                            @endif
+                        </div>
+                        <livewire:loan-request-review :loan-id="$loan->id" :key="'agent-review-'.$loan->id" />
+                    </div>
+                </article>
+            @empty
+                <p class="rounded-xl bg-white p-4 text-sm text-gray-500">Aucune demande en attente dans votre zone.</p>
+            @endforelse
+        </div>
+    </section>
 
     {{-- Cartes statistiques --}}
     <div class="grid grid-cols-3 gap-3 mb-8">
@@ -82,7 +110,9 @@
                                 <span class="text-xs font-medium px-2.5 py-1 rounded-full {{ $badgeClasses }}">
                                     {{ $badgeLabel }}
                                 </span>
-                                <a href="{{ url('/agent/manual-payment/' . $next->id) }}"
+                                <a href="{{ $next instanceof \App\Models\LoanSchedule
+                                    ? url('/agent/manual-loan-payment/' . $next->id)
+                                    : url('/agent/manual-payment/' . $next->id) }}"
                                    class="text-xs bg-brand-600 hover:bg-brand-700 text-white font-medium px-3 py-1.5 rounded-lg">
                                     Enregistrer un versement
                                 </a>
