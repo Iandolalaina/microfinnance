@@ -12,6 +12,7 @@
             </h1>
         </div>
         <div class="flex items-center gap-4">
+            <a href="{{ route('home') }}" class="text-sm text-gray-500 hover:text-brand-600">Accueil</a>
             <a href="{{ url('/agent/announcements') }}" class="text-sm text-brand-600 hover:underline">
                 Publier une annonce
             </a>

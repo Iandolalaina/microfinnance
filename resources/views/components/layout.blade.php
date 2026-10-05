@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'MITSINJO' }}</title>
+    @include('partials.pwa')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles {{-- Nécessaire : injecte le CSS interne de Livewire --}}
 </head>

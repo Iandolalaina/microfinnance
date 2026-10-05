@@ -5,7 +5,10 @@
     @if (! $done)
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
 
-            <a href="{{ url('/agent/dashboard') }}" class="text-sm text-gray-400 mb-4 inline-block">← Retour</a>
+            <div class="mb-4 flex items-center justify-between">
+                <a href="{{ url('/agent/dashboard') }}" class="text-sm text-gray-400">← Retour</a>
+                <a href="{{ route('home') }}" class="text-sm text-gray-500 hover:text-brand-600">Accueil</a>
+            </div>
 
             <h1 class="text-lg font-semibold text-gray-900 mb-1">Versement en espèces</h1>
             <p class="text-sm text-gray-500 mb-5">

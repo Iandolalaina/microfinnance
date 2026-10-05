@@ -4,16 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Connexion - MITSINJO</title>
+    @include('partials.pwa')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="bg-gray-50 min-h-screen flex items-center justify-center px-4">
 
     <div class="w-full max-w-sm">
 
+        <a href="{{ route('home') }}" class="block text-center text-sm text-gray-500 hover:text-brand-600 mb-6">← Accueil MITSINJO</a>
+
         {{-- Logo / Titre --}}
         <div class="text-center mb-8">
             <div class="mx-auto h-14 w-14 rounded-full bg-brand-600 flex items-center justify-center mb-3">
-             
+                <span class="text-white text-2xl font-bold">M</span>
             </div>
             <h1 class="text-xl font-semibold text-gray-900">MITSINJO</h1>
             <p class="text-sm text-gray-500 mt-1">Connectez-vous à votre espace</p>
@@ -29,17 +32,17 @@
         <form method="POST" action="{{ url('/login') }}" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-5">
             @csrf {{-- Jeton de sécurité obligatoire pour tout formulaire Laravel --}}
 
-            {{-- Numéro de téléphone --}}
+            {{-- Téléphone ou matricule --}}
             <div>
-                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1.5">
-                    Numéro de téléphone
+                <label for="login" class="block text-sm font-medium text-gray-700 mb-1.5">
+                    Téléphone ou matricule
                 </label>
                 <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value="{{ old('phone') }}"
-                    placeholder="034 00 000 00"
+                    type="text"
+                    id="login"
+                    name="login"
+                    value="{{ old('login') }}"
+                    placeholder="034 00 000 00 ou MTS-2026-000123"
                     required
                     autofocus
                     class="w-full rounded-xl border border-gray-300 px-4 py-3 text-base
@@ -80,9 +83,10 @@
             </button>
         </form>
 
-        <p class="text-center text-xs text-gray-400 mt-6">
-            Besoin d'aide ? Contactez votre agent ONG.
+        <p class="mt-6 text-center text-sm text-gray-500">
+            Pas encore membre ? <a href="{{ route('register') }}" class="font-medium text-brand-600 hover:text-brand-700">Devenir membre</a>
         </p>
+        <p class="mt-3 text-center text-xs text-gray-400">Besoin d'aide ? Contactez votre agent ONG.</p>
     </div>
 
 </body>

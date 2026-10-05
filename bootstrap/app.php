@@ -15,6 +15,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureUserHasRole::class,
         ]);
+
+        // Fait confiance aux en-têtes envoyés par un proxy devant l'appli
+        // (ngrok pendant les tests, et plus tard un vrai hébergeur).
+        // Sans ça, Laravel peut mal détecter le HTTPS et bloquer certaines
+        // requêtes de sécurité (CSRF) lors d'un accès via tunnel.
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

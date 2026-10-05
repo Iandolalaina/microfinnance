@@ -1,7 +1,10 @@
 <div class="max-w-md mx-auto px-4 py-6 pb-24">
 
     {{-- Bandeau de marque --}}
-    <p class="text-center text-brand-600 font-bold tracking-wide text-sm mb-4">MITSINJO</p>
+    <div class="flex items-center justify-between mb-4">
+        <p class="text-brand-600 font-bold tracking-wide text-sm">MITSINJO</p>
+        <a href="{{ route('home') }}" class="text-sm text-gray-500 hover:text-brand-600">Accueil</a>
+    </div>
 
     {{-- En-tête avec nom du client et déconnexion --}}
     <div class="flex items-center justify-between mb-6">
@@ -16,6 +19,51 @@
             </button>
         </form>
     </div>
+
+    @if (session('member_matricule'))
+        <div class="mb-5 rounded-xl border border-green-200 bg-green-50 p-4" role="status">
+            <p class="text-sm font-medium text-green-800">Votre inscription est confirmée. Voici votre matricule :</p>
+            <p class="mt-1 text-lg font-bold text-green-900">{{ session('member_matricule') }}</p>
+            <p class="mt-1 text-xs text-green-700">Gardez-le pour vous connecter à votre espace.</p>
+        </div>
+    @endif
+
+    <section class="mb-6" aria-labelledby="announcements-heading">
+        <div class="mb-3 flex items-center justify-between">
+            <h2 id="announcements-heading" class="text-sm font-semibold text-gray-700">Informations de MITSINJO</h2>
+            @if (config('webpush.vapid.public_key'))
+                <button
+                    type="button"
+                    data-enable-push
+                    data-vapid-public-key="{{ config('webpush.vapid.public_key') }}"
+                    data-subscription-url="{{ route('push-subscriptions.store') }}"
+                    class="text-xs font-medium text-brand-600 hover:text-brand-700"
+                >Activer les notifications</button>
+            @endif
+        </div>
+        <p data-push-status class="mb-3 text-xs text-gray-500" aria-live="polite">
+            @if (! config('webpush.vapid.public_key'))
+                Notifications push non configurées sur le serveur.
+            @else
+                Activez les notifications sur cet appareil pour recevoir les nouvelles informations hors ligne.
+            @endif
+        </p>
+        <div class="space-y-2">
+            @forelse ($announcements as $announcement)
+                <article class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+                    <div class="mb-1 flex items-start justify-between gap-3">
+                        <h3 class="text-sm font-semibold text-gray-900">{{ $announcement->title }}</h3>
+                        <time class="shrink-0 text-xs text-gray-400" datetime="{{ $announcement->published_at->toIso8601String() }}">
+                            {{ $announcement->published_at->format('d/m/Y') }}
+                        </time>
+                    </div>
+                    <p class="whitespace-pre-line text-sm leading-6 text-gray-600">{{ $announcement->content }}</p>
+                </article>
+            @empty
+                <p class="rounded-xl border border-gray-100 bg-white p-4 text-sm text-gray-500">Aucune information pour le moment.</p>
+            @endforelse
+        </div>
+    </section>
 
     @if (! $loan)
         {{-- Cas où le client n'a aucun prêt actif en ce moment --}}

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class LoginController extends Controller
@@ -25,16 +27,22 @@ class LoginController extends Controller
     {
         // 1. On valide que les champs sont bien remplis
         $credentials = $request->validate([
-            'phone' => ['required', 'string'],
+            'login' => ['required', 'string'],
             'password' => ['required', 'string'],
         ], [
-            'phone.required' => 'Le numéro de téléphone est obligatoire.',
+            'login.required' => 'Le téléphone ou le matricule est obligatoire.',
             'password.required' => 'Le mot de passe est obligatoire.',
         ]);
 
-        // 2. Auth::attempt() vérifie automatiquement le mot de passe hashé
-        //    en base (grâce au cast 'password' => 'hashed' dans le modèle User)
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        $user = User::query()
+            ->where(fn ($query) => $query
+                ->where('phone', $credentials['login'])
+                ->orWhere('matricule', $credentials['login']))
+            ->where('is_active', true)
+            ->first();
+
+        if ($user && Hash::check($credentials['password'], $user->password)) {
+            Auth::login($user, $request->boolean('remember'));
 
             // 3. Sécurité : on régénère l'identifiant de session après connexion
             $request->session()->regenerate();
@@ -44,8 +52,8 @@ class LoginController extends Controller
 
         // 4. Si échec : on revient au formulaire avec un message d'erreur
         return back()
-            ->withErrors(['phone' => 'Numéro de téléphone ou mot de passe incorrect.'])
-            ->onlyInput('phone');
+            ->withErrors(['login' => 'Téléphone, matricule ou mot de passe incorrect.'])
+            ->onlyInput('login');
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Announcement;
 use App\Models\Zone;
+use App\Services\AnnouncementDeliveryService;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -16,11 +17,11 @@ class AnnouncementForm extends Component
 
     public ?int $zoneId = null;
 
-    public bool $sendSms = false;
-
     public bool $published = false;
 
-    public function publish(): void
+    public string $deliveryMessage = '';
+
+    public function publish(AnnouncementDeliveryService $delivery): void
     {
         $this->validate([
             'title' => ['required', 'string', 'max:200'],
@@ -30,16 +31,24 @@ class AnnouncementForm extends Component
             'content.required' => "Le contenu est obligatoire.",
         ]);
 
-        Announcement::create([
+        $announcement = Announcement::create([
             'title' => $this->title,
             'content' => $this->content,
             'zone_id' => $this->zoneId,
             'created_by' => auth()->id(),
-            'send_sms' => $this->sendSms,
             'published_at' => now(),
         ]);
 
-        $this->reset(['title', 'content', 'zoneId', 'sendSms']);
+        $result = $delivery->deliver($announcement);
+        $this->deliveryMessage = match (true) {
+            ! $result['configured'] => "Annonce publiée dans l'espace membre. Les notifications push ne sont pas configurées sur le serveur.",
+            $result['sent'] > 0 && $result['failed'] > 0 => "Annonce publiée ; {$result['sent']} appareil(s) notifié(s), {$result['failed']} envoi(s) en échec. Consultez les journaux.",
+            $result['sent'] > 0 => "Annonce publiée et envoyée à {$result['sent']} appareil(s) abonné(s).",
+            $result['failed'] > 0 => "Annonce publiée dans l'espace membre, mais {$result['failed']} notification(s) push ont échoué. Consultez les journaux.",
+            default => "Annonce publiée dans l'espace membre. Aucun appareil n'a encore activé les notifications.",
+        };
+
+        $this->reset(['title', 'content', 'zoneId']);
         $this->published = true;
     }
 

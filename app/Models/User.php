@@ -20,11 +20,16 @@ class User extends Authenticatable
         'name',
         'email',
         'phone',
+        'matricule',
+        'cin',
         'password',
         'pin',
         'role',
         'zone_id',
         'address',
+        'profile_photo',
+        'region',
+        'fokontany',
         'is_active',
     ];
 
@@ -111,6 +116,11 @@ class User extends Authenticatable
     public function smsLogs(): HasMany
     {
         return $this->hasMany(SmsLog::class, 'user_id');
+    }
+
+    public function pushSubscriptions(): HasMany
+    {
+        return $this->hasMany(PushSubscription::class);
     }
 
     // ------------------------------------------------------------

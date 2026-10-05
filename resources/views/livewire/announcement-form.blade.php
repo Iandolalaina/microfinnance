@@ -1,18 +1,31 @@
 <div class="max-w-md mx-auto px-4 py-6">
 
+    @php
+        $dashboardUrl = auth()->user()->role === 'admin'
+            ? url('/admin/dashboard')
+            : url('/agent/dashboard');
+    @endphp
+
     <p class="text-center text-brand-600 font-bold tracking-wide text-sm mb-6">MITSINJO — Annonces</p>
 
     <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
 
-        <a href="{{ url('/agent/dashboard') }}" class="text-sm text-gray-400 mb-4 inline-block">← Retour</a>
+        <div class="mb-4 flex items-center justify-between">
+            <a href="{{ $dashboardUrl }}" class="text-sm text-gray-400">← Retour</a>
+            <a href="{{ route('home') }}" class="text-sm text-gray-500 hover:text-brand-600">Accueil</a>
+        </div>
 
         <h1 class="text-lg font-semibold text-gray-900 mb-5">Publier une annonce</h1>
 
         @if ($published)
             <div class="bg-green-50 border border-green-100 rounded-xl p-4 mb-5 text-sm text-green-700">
-                ✓ Annonce publiée avec succès.
+                {{ $deliveryMessage }}
             </div>
         @endif
+
+        <p class="mb-5 text-sm leading-6 text-gray-500">
+            L'annonce apparaîtra dans l'espace des membres concernés. Les appareils abonnés recevront aussi une notification, même si la PWA est fermée.
+        </p>
 
         <form wire:submit="publish" class="space-y-4">
             <div>
@@ -48,17 +61,6 @@
                     @endforeach
                 </select>
             </div>
-
-            <div class="flex items-center">
-                <input type="checkbox" wire:model="sendSms" id="sendSms"
-                       class="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500">
-                <label for="sendSms" class="ml-2 text-sm text-gray-600">
-                    Envoyer aussi par SMS
-                </label>
-            </div>
-            <p class="text-xs text-gray-400 -mt-2">
-                (L'envoi SMS réel sera activé à la prochaine étape du projet)
-            </p>
 
             <button
                 type="submit"

@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Announcement;
 use App\Models\Loan;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -31,9 +32,17 @@ class ClientDashboard extends Component
             ? $loan->schedules()->orderBy('due_date')->get()
             : collect();
 
+        $announcements = Announcement::visibleTo(auth()->user())
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->latest('published_at')
+            ->limit(10)
+            ->get();
+
         return view('livewire.client-dashboard', [
             'loan' => $loan,
             'schedules' => $schedules,
+            'announcements' => $announcements,
         ]);
     }
 }

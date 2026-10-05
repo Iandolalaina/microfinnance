@@ -9,11 +9,11 @@ module.exports = {
     extend: {
       colors: {
         brand: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
+          50: '#eef6fd',
+          100: '#d6e9f9',
+          500: '#0a72c4',
+          600: '#0259a0', // ← bleu exact du logo MITSINJO
+          700: '#024780',
         },
       },
     },

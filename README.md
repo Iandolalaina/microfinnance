@@ -64,3 +64,21 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Notifications PWA
+
+Les annonces publiees par un admin ou un agent apparaissent dans l'espace des membres concernes. Les membres qui activent les notifications recoivent aussi un Web Push, y compris lorsque la PWA est fermee. Le service push conserve les notifications jusqu'a 7 jours pour les appareils temporairement hors ligne.
+
+Configuration initiale sur chaque environnement :
+
+```sh
+composer install
+php artisan migrate --force
+php artisan webpush:generate-keys
+```
+
+La commande VAPID ecrit les cles dans `.env`, ne les affiche pas et ne remplace pas une paire deja configuree. Gardez la meme paire de cles dans le temps et ne publiez jamais la cle privee. Remplacez `WEBPUSH_VAPID_SUBJECT` par une adresse de contact valide, par exemple `mailto:notifications@votre-domaine.mg`.
+
+Le site doit etre servi en HTTPS pour les navigateurs mobiles (HTTP est accepte sur `localhost`). Chaque membre doit se connecter et activer les notifications sur chacun de ses appareils, puis autoriser les notifications dans le navigateur. Le systeme d'exploitation peut aussi bloquer les notifications. La livraison hors ligne depend du navigateur et du service push de l'appareil; elle a lieu lorsque celui-ci retrouve le reseau.
+
+L'envoi SMS n'est pas configure : `FakeSmsService` est un simulateur. Il faut choisir un fournisseur SMS et configurer ses identifiants avant de promettre une livraison par SMS.

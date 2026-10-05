@@ -21,6 +21,14 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if (! getenv('OPENSSL_CONF')) {
+            $wampOpenSslConfig = dirname(PHP_BINARY).DIRECTORY_SEPARATOR.'extras'.DIRECTORY_SEPARATOR.'ssl'.DIRECTORY_SEPARATOR.'openssl.cnf';
+
+            if (is_file($wampOpenSslConfig)) {
+                putenv('OPENSSL_CONF='.$wampOpenSslConfig);
+            }
+        }
+
         \Illuminate\Support\Facades\Schema::defaultStringLength(191);
     }
 }
