@@ -7,18 +7,13 @@ use App\Models\Payment;
 use App\Services\PaymentConfirmationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class MvolaWebhookController extends Controller
 {
     /**
-     * Point d'entrée que MVOLA_CALLBACK_URL (voir .env) appellera
-     * automatiquement pour confirmer une transaction réelle.
-     *
-     * NOTE PÉDAGOGIQUE : la structure exacte du JSON envoyé par Mvola
-     * sera à ajuster une fois la vraie documentation sandbox consultée
-     * (elle varie légèrement selon les versions de leur API). La logique
-     * de fond (retrouver le paiement, appeler le service de confirmation)
-     * restera la même.
+     * Point d'entree que MVOLA_CALLBACK_URL appellera automatiquement pour
+     * confirmer une transaction reelle.
      */
     public function handle(Request $request, PaymentConfirmationService $confirmation): JsonResponse
     {
@@ -35,19 +30,18 @@ class MvolaWebhookController extends Controller
             return response()->json(['error' => 'Paiement introuvable'], 404);
         }
 
-        // Sécurité anti-doublon : si déjà confirmé, on ne refait rien
-        if ($payment->status === 'confirmed') {
-            return response()->json(['message' => 'Déjà confirmé']);
+        if ($payment->status === 'confirmed' || $payment->status === 'SUCCESS') {
+            return response()->json(['message' => 'Deja confirme']);
         }
 
-        $status = $request->input('status', 'completed');
+        $status = Str::upper((string) $request->input('status', 'SUCCESS'));
 
-        if ($status === 'completed' || $status === 'success') {
+        if (in_array($status, ['COMPLETED', 'SUCCESS'], true)) {
             $confirmation->confirm($payment);
         } else {
             $payment->update(['status' => 'failed']);
         }
 
-        return response()->json(['message' => 'Notification traitée avec succès']);
+        return response()->json(['message' => 'Notification traitee avec succes']);
     }
 }

@@ -2,72 +2,108 @@
 
 namespace App\Services;
 
+use App\Events\PaymentReceived;
 use App\Models\Payment;
+use App\Models\Schedule;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 
 class PaymentConfirmationService
 {
-    public function __construct(protected SmsNotifier $smsNotifier)
-    {
-    }
-
     /**
-     * Confirme un versement : met à jour le paiement, l'échéance liée,
-     * génère le reçu PDF, puis envoie un SMS de confirmation au client.
+     * Confirme un versement, applique son montant sur les echeances, genere
+     * le recu PDF, puis declenche le SMS de confirmation via evenement.
      */
     public function confirm(Payment $payment): Payment
     {
-        // 1. On marque le paiement comme confirmé
-        $payment->status = 'confirmed';
-        $payment->paid_at = now();
+        [$payment, $wasAlreadyConfirmed] = DB::transaction(function () use ($payment): array {
+            $lockedPayment = Payment::whereKey($payment->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        // 2. On met à jour l'échéance concernée (si elle existe)
-        if ($payment->schedule_id) {
-            $schedule = $payment->schedule;
-            $schedule->amount_paid += $payment->amount;
+            if ($lockedPayment->status === 'confirmed' || $lockedPayment->status === 'SUCCESS') {
+                return [$lockedPayment, true];
+            }
 
-            $schedule->status = $schedule->amount_paid >= $schedule->amount_due
-                ? 'paid'
-                : 'partial';
+            $lockedPayment->status = 'confirmed';
+            $lockedPayment->paid_at = now();
+            $lockedPayment->save();
 
-            $schedule->save();
+            if ($lockedPayment->schedule_id) {
+                $this->applyPaymentToSchedules($lockedPayment);
+            }
+
+            return [$lockedPayment, false];
+        });
+
+        if ($wasAlreadyConfirmed) {
+            return $payment->refresh();
         }
 
-        // 3. On génère le PDF du reçu et on enregistre son chemin
         $payment->receipt_path = $this->generateReceiptPdf($payment);
-
         $payment->save();
 
-        // 4. On envoie un SMS de confirmation au client
-        $this->sendConfirmationSms($payment);
+        Event::dispatch(new PaymentReceived($payment->refresh()));
 
         return $payment;
     }
 
     /**
-     * Envoie un SMS confirmant le versement — utile en particulier pour
-     * les clients sans connexion internet (voir cahier des charges).
+     * Impute le montant paye sur l'echeance courante, puis sur les suivantes
+     * lorsqu'il existe un surplus.
      */
-    protected function sendConfirmationSms(Payment $payment): void
+    protected function applyPaymentToSchedules(Payment $payment): void
     {
-        $client = $payment->client;
+        $currentSchedule = Schedule::whereKey($payment->schedule_id)
+            ->lockForUpdate()
+            ->firstOrFail();
 
-        if (! $client || ! $client->phone) {
-            return;
+        $schedules = Schedule::where('loan_id', $payment->loan_id)
+            ->where(function ($query) use ($currentSchedule) {
+                $query->where('due_date', '>', $currentSchedule->due_date)
+                    ->orWhere(function ($query) use ($currentSchedule) {
+                        $query->where('due_date', $currentSchedule->due_date)
+                            ->where('id', '>=', $currentSchedule->id);
+                    });
+            })
+            ->where('status', '!=', 'paid')
+            ->orderBy('due_date')
+            ->orderBy('id')
+            ->lockForUpdate()
+            ->get();
+
+        $remainingPayment = (float) $payment->amount;
+
+        foreach ($schedules as $schedule) {
+            if ($remainingPayment <= 0) {
+                break;
+            }
+
+            $remainingDue = max(0, (float) $schedule->amount_due - (float) $schedule->amount_paid);
+
+            if ($remainingDue <= 0) {
+                $schedule->status = 'paid';
+                $schedule->save();
+                continue;
+            }
+
+            $amountApplied = min($remainingPayment, $remainingDue);
+
+            $schedule->amount_paid = (float) $schedule->amount_paid + $amountApplied;
+            $remainingPayment -= $amountApplied;
+
+            $schedule->status = (float) $schedule->amount_paid >= (float) $schedule->amount_due
+                ? 'paid'
+                : 'partial';
+
+            $schedule->save();
         }
-
-        $message = sprintf(
-            'MITSINJO: Versement de %s Ar bien recu le %s. Merci !',
-            number_format($payment->amount, 0, ' ', ' '),
-            $payment->paid_at->format('d/m/Y a H:i'),
-        );
-
-        $this->smsNotifier->send($client, $client->phone, $message, 'confirmation');
     }
 
     /**
-     * Génère un PDF de reçu à partir d'une vue Blade, et le stocke
+     * Genere un PDF de recu a partir d'une vue Blade, et le stocke
      * dans storage/app/public/receipts/.
      */
     protected function generateReceiptPdf(Payment $payment): string

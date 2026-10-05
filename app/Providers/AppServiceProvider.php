@@ -2,10 +2,13 @@
 
 namespace App\Providers;
 
+use App\Events\PaymentReceived;
+use App\Listeners\SendPaymentReceivedSms;
 use App\Services\Mvola\FakeMvolaService;
 use App\Services\Mvola\MvolaServiceInterface;
 use App\Services\Sms\FakeSmsService;
 use App\Services\Sms\SmsServiceInterface;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,6 +24,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Event::listen(PaymentReceived::class, SendPaymentReceivedSms::class);
+
         if (! getenv('OPENSSL_CONF')) {
             $wampOpenSslConfig = dirname(PHP_BINARY).DIRECTORY_SEPARATOR.'extras'.DIRECTORY_SEPARATOR.'ssl'.DIRECTORY_SEPARATOR.'openssl.cnf';
 
