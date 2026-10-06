@@ -36,33 +36,28 @@
         .nav-cta, .button-primary, .button-outline { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 20px; border-radius: 4px; font-size: 13px; font-weight: 700; transition: transform .2s ease, background .2s ease; }
         .nav-cta, .button-primary { color: #fff; background: var(--mitsinjo-blue); }
         .nav-cta:hover, .button-primary:hover { background: #034b82; transform: translateY(-2px); }
-        .hero { background: var(--mitsinjo-paper); }
-        .hero-inner { width: min(1160px, calc(100% - 48px)); min-height: 550px; margin: auto; display: grid; grid-template-columns: 1fr 1.02fr; align-items: center; gap: 60px; padding: 54px 0 62px; }
         .eyebrow { display: inline-flex; align-items: center; gap: 9px; color: var(--mitsinjo-green); font-size: 11px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
         .eyebrow::before { width: 24px; height: 2px; background: var(--mitsinjo-gold); content: ''; }
         h1, h2, h3, p { margin-top: 0; }
-        .hero h1 { max-width: 540px; margin: 20px 0 18px; color: var(--mitsinjo-green); font-family: 'Lora', serif; font-size: clamp(40px, 5vw, 64px); font-weight: 600; line-height: 1.08; }
-        .hero h1 span { color: var(--mitsinjo-blue); }
-        .hero-copy { max-width: 465px; margin-bottom: 28px; color: #5f7069; font-size: 16px; line-height: 1.8; }
-        .hero-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 22px; }
-        .text-link { display: inline-flex; align-items: center; gap: 8px; color: var(--mitsinjo-green); font-size: 13px; font-weight: 700; }
-        .hero-photo { position: relative; min-height: 400px; }
-        .hero-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 2px; }
-        .photo-note { position: absolute; right: -20px; bottom: 24px; max-width: 215px; padding: 17px 20px; color: #fff; background: var(--mitsinjo-green); font-size: 12px; line-height: 1.6; }
-        .photo-note strong { display: block; margin-bottom: 3px; color: #f4c65c; font-size: 17px; }
+        .hero { width: 100%; }
+        .hero-carousel { position: relative; width: 100%; height: clamp(360px, 62vw, 650px); overflow: hidden; background: #e7ede8; }
+        .carousel-slide { position: absolute; inset: 0; }
+        .carousel-slide[hidden] { display: none; }
+        .carousel-slide img { width: 100%; height: 100%; object-fit: cover; }
+        .carousel-placeholder { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; padding: 24px; color: #4f615a; background: linear-gradient(135deg, #edf3ef, #dce7df); text-align: center; }
+        .carousel-placeholder code { display: block; margin-top: 10px; color: var(--mitsinjo-blue); font-size: 14px; }
+        .carousel-controls { position: absolute; right: 20px; bottom: 20px; left: 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+        .carousel-arrow, .carousel-toggle, .carousel-indicator { display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; border: 1px solid rgb(255 255 255 / 70%); border-radius: 4px; color: #fff; background: rgb(24 43 53 / 68%); cursor: pointer; }
+        .carousel-arrow { font-size: 24px; }
+        .carousel-navigation { display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .carousel-indicator { min-width: 34px; min-height: 34px; border-radius: 50%; font-size: 12px; }
+        .carousel-indicator[aria-current="true"] { color: var(--mitsinjo-ink); background: #fff; }
+        .carousel-toggle { padding: 0 12px; font-size: 12px; font-weight: 600; }
+        .carousel-arrow:hover, .carousel-toggle:hover, .carousel-indicator:hover { background: var(--mitsinjo-blue); }
+        .carousel-arrow:focus-visible, .carousel-toggle:focus-visible, .carousel-indicator:focus-visible { outline: 3px solid #f4c65c; outline-offset: 3px; }
         .intro { width: min(1160px, calc(100% - 48px)); margin: auto; padding: 74px 0 66px; display: grid; grid-template-columns: .72fr 1fr; gap: 80px; align-items: start; }
-        .intro h2, .section-heading h2, .impact-copy h2 { margin: 13px 0 0; color: var(--mitsinjo-green); font-family: 'Lora', serif; font-size: 34px; line-height: 1.2; }
+        .intro h2, .impact-copy h2 { margin: 13px 0 0; color: var(--mitsinjo-green); font-family: 'Lora', serif; font-size: 34px; line-height: 1.2; }
         .intro p { margin: 0; color: #63716c; font-size: 15px; line-height: 1.9; }
-        .services { padding: 72px 0 78px; background: #edf3ef; }
-        .section-inner { width: min(1160px, calc(100% - 48px)); margin: auto; }
-        .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 30px; margin-bottom: 38px; }
-        .section-heading p { max-width: 330px; margin: 0 0 3px; color: #63716c; font-size: 14px; line-height: 1.75; }
-        .service-list { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #cedbd3; }
-        .service-item { min-height: 205px; padding: 28px 28px 24px 0; border-bottom: 1px solid #cedbd3; }
-        .service-item + .service-item { padding-left: 28px; border-left: 1px solid #cedbd3; }
-        .service-number { color: var(--mitsinjo-blue); font-size: 12px; font-weight: 700; letter-spacing: .08em; }
-        .service-item h3 { margin: 22px 0 10px; color: var(--mitsinjo-green); font-family: 'Lora', serif; font-size: 21px; }
-        .service-item p { max-width: 300px; margin-bottom: 0; color: #63716c; font-size: 13px; line-height: 1.8; }
         .impact { color: #fff; background: var(--mitsinjo-green); }
         .impact-inner { width: min(1160px, calc(100% - 48px)); min-height: 250px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 45px; padding: 52px 0; }
         .impact-copy { max-width: 580px; }
@@ -89,19 +84,14 @@
             .mobile-services .services-dropdown { position: static; display: flex; gap: 8px; margin-top: 8px; padding: 0; border: 0; box-shadow: none; }
             .mobile-services .services-dropdown a { padding: 8px 12px; background: #edf3ef; }
             .nav-cta { min-height: 40px; padding: 0 14px; font-size: 12px; }
-            .hero-inner { width: min(100% - 36px, 620px); grid-template-columns: 1fr; gap: 32px; padding: 54px 0 46px; }
-            .hero h1 { max-width: 520px; font-size: 46px; }
-            .hero-photo { min-height: 310px; margin-right: 14px; }
-            .photo-note { right: -14px; bottom: 15px; }
+            .hero-carousel { height: 62vh; min-height: 300px; max-height: 520px; }
+            .carousel-controls { right: 12px; bottom: 12px; left: 12px; gap: 8px; }
+            .carousel-arrow, .carousel-toggle { min-width: 40px; min-height: 40px; }
+            .carousel-navigation { gap: 5px; }
+            .carousel-indicator { min-width: 32px; min-height: 32px; }
             .intro { width: min(100% - 36px, 620px); grid-template-columns: 1fr; gap: 22px; padding: 56px 0; }
-            .intro h2, .section-heading h2, .impact-copy h2 { font-size: 29px; }
-            .section-inner, .impact-inner, .footer-inner { width: min(100% - 36px, 620px); }
-            .services { padding: 56px 0; }
-            .section-heading { display: block; margin-bottom: 26px; }
-            .section-heading p { margin-top: 13px; }
-            .service-list { grid-template-columns: 1fr; }
-            .service-item, .service-item + .service-item { min-height: 0; padding: 22px 0; border-left: 0; }
-            .service-item h3 { margin-top: 12px; }
+            .intro h2, .impact-copy h2 { font-size: 29px; }
+            .impact-inner, .footer-inner { width: min(100% - 36px, 620px); }
             .impact-inner { min-height: 0; align-items: start; flex-direction: column; gap: 24px; padding: 48px 0; }
             .footer-inner { min-height: 100px; align-items: start; flex-direction: column; justify-content: center; gap: 11px; }
         }
@@ -150,18 +140,34 @@
 
     <main>
         <section class="hero" id="accueil">
-            <div class="hero-inner">
-                <div class="reveal">
-                    <span class="eyebrow">La finance au plus près de vous</span>
-                    <h1>Faisons grandir <span>vos projets.</span></h1>
-                    <p class="hero-copy">MITSINJO accompagne les personnes et les petites activités avec des solutions de microfinance accessibles, un suivi clair et un service de proximité.</p>
-                    <div class="hero-actions">
-                        <a class="text-link" href="#services">Nos services <span aria-hidden="true">→</span></a>
+            @php
+                $homeSlides = [
+                    ['path' => 'images/accueil/accueil-1.jpg', 'alt' => 'Membres de la communauté réunis autour de leurs projets'],
+                    ['path' => 'images/accueil/accueil-2.jpg', 'alt' => 'Activité locale soutenue par la microfinance'],
+                    ['path' => 'images/accueil/accueil-3.jpg', 'alt' => 'Agent accompagnant un membre dans ses démarches'],
+                ];
+            @endphp
+            <div class="hero-carousel" data-carousel role="region" aria-roledescription="carrousel" aria-label="Photos de MITSINJO">
+                @foreach ($homeSlides as $index => $slide)
+                    <div class="carousel-slide" data-carousel-slide role="group" aria-roledescription="diapositive" aria-label="{{ $index + 1 }} sur {{ count($homeSlides) }}" @if ($index > 0) hidden @endif>
+                        @if (file_exists(public_path($slide['path'])))
+                            <img src="{{ asset($slide['path']) }}" alt="{{ $slide['alt'] }}" @if ($index === 0) fetchpriority="high" @endif>
+                        @else
+                            <div class="carousel-placeholder">
+                                <p>Photo à ajouter<code>public/{{ $slide['path'] }}</code></p>
+                            </div>
+                        @endif
                     </div>
-                </div>
-                <div class="hero-photo reveal" aria-label="Des membres d'une communauté réunis">
-                    <img src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=85" alt="Un groupe réuni autour d'un projet commun" fetchpriority="high">
-                    <div class="photo-note"><strong>À vos côtés</strong>Un accompagnement humain, au rythme de vos projets.</div>
+                @endforeach
+                <div class="carousel-controls">
+                    <button class="carousel-arrow" type="button" data-carousel-previous aria-label="Photo précédente">‹</button>
+                    <div class="carousel-navigation" aria-label="Choisir une photo">
+                        @foreach ($homeSlides as $index => $slide)
+                            <button class="carousel-indicator" type="button" data-carousel-indicator="{{ $index }}" aria-label="Afficher la photo {{ $index + 1 }}" aria-current="{{ $index === 0 ? 'true' : 'false' }}">{{ $index + 1 }}</button>
+                        @endforeach
+                    </div>
+                    <button class="carousel-toggle" type="button" data-carousel-toggle aria-label="Mettre le défilement en pause">Pause</button>
+                    <button class="carousel-arrow" type="button" data-carousel-next aria-label="Photo suivante">›</button>
                 </div>
             </div>
         </section>
@@ -172,20 +178,6 @@
                 <h2>Donner aux initiatives locales les moyens d’avancer.</h2>
             </div>
             <p>Nous croyons qu’un accompagnement financier de proximité peut aider chacun à concrétiser ses projets. MITSINJO met l’accent sur la relation avec les agents, la clarté du suivi et des outils simples pour gérer les échéances.</p>
-        </section>
-
-        <section class="services" id="services">
-            <div class="section-inner">
-                <div class="section-heading">
-                    <div><span class="eyebrow">Nos services</span><h2>Un appui concret, à chaque étape.</h2></div>
-                    <p>Des outils conçus pour faciliter le suivi des financements et des remboursements.</p>
-                </div>
-                <div class="service-list">
-                    <article class="service-item"><span class="service-number">01 / FINANCEMENT</span><h3><a href="{{ route('credits.index') }}">Des projets accompagnés</a></h3><p>Un suivi de crédit organisé pour aider les clients à garder le cap sur leurs objectifs.</p></article>
-                    <article class="service-item"><span class="service-number">02 / SUIVI</span><h3>Une vision claire</h3><p>Retrouvez les montants, les échéances et l’avancement de vos remboursements dans votre espace.</p></article>
-                    <article class="service-item"><span class="service-number">03 / PROXIMITÉ</span><h3>Un lien avec votre agent</h3><p>Les agents assurent le suivi sur le terrain et vous accompagnent dans vos démarches.</p></article>
-                </div>
-            </div>
         </section>
 
         <section class="impact">
@@ -203,5 +195,90 @@
         </div>
     </footer>
 </div>
+<script>
+    (() => {
+        const carousel = document.querySelector('[data-carousel]');
+
+        if (!carousel) return;
+
+        const slides = [...carousel.querySelectorAll('[data-carousel-slide]')];
+        const indicators = [...carousel.querySelectorAll('[data-carousel-indicator]')];
+        const toggle = carousel.querySelector('[data-carousel-toggle]');
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let currentSlide = 0;
+        let timer;
+        let paused = reducedMotion;
+        let hovered = false;
+        let focused = false;
+
+        const showSlide = (index) => {
+            currentSlide = (index + slides.length) % slides.length;
+            slides.forEach((slide, slideIndex) => {
+                slide.hidden = slideIndex !== currentSlide;
+            });
+            indicators.forEach((indicator, indicatorIndex) => {
+                indicator.setAttribute('aria-current', String(indicatorIndex === currentSlide));
+            });
+        };
+
+        const stopRotation = () => {
+            window.clearInterval(timer);
+            timer = undefined;
+        };
+
+        const startRotation = () => {
+            stopRotation();
+            if (!paused && !hovered && !focused && !document.hidden && slides.length > 1) {
+                timer = window.setInterval(() => showSlide(currentSlide + 1), 5000);
+            }
+        };
+
+        carousel.querySelector('[data-carousel-previous]').addEventListener('click', () => {
+            showSlide(currentSlide - 1);
+            startRotation();
+        });
+        carousel.querySelector('[data-carousel-next]').addEventListener('click', () => {
+            showSlide(currentSlide + 1);
+            startRotation();
+        });
+        indicators.forEach((indicator) => {
+            indicator.addEventListener('click', () => {
+                showSlide(Number(indicator.dataset.carouselIndicator));
+                startRotation();
+            });
+        });
+        toggle.addEventListener('click', () => {
+            paused = !paused;
+            toggle.textContent = paused ? 'Reprendre' : 'Pause';
+            toggle.setAttribute('aria-label', paused ? 'Reprendre le défilement' : 'Mettre le défilement en pause');
+            startRotation();
+        });
+        carousel.addEventListener('mouseenter', () => {
+            hovered = true;
+            stopRotation();
+        });
+        carousel.addEventListener('mouseleave', () => {
+            hovered = false;
+            startRotation();
+        });
+        carousel.addEventListener('focusin', () => {
+            focused = true;
+            stopRotation();
+        });
+        carousel.addEventListener('focusout', (event) => {
+            if (!carousel.contains(event.relatedTarget)) {
+                focused = false;
+                startRotation();
+            }
+        });
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) stopRotation();
+            else startRotation();
+        });
+
+        toggle.textContent = paused ? 'Reprendre' : 'Pause';
+        startRotation();
+    })();
+</script>
 </body>
 </html>

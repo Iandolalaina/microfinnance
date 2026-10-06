@@ -31,38 +31,69 @@
             </p>
         </section>
 
-        <section class="grid gap-5 md:grid-cols-3" aria-label="Types de crédit">
+        @php
+            $creditPhotos = [
+                'AGR' => [
+                    'path' => 'images/credits/credit-activite-generatrice-revenus.jpg',
+                    'alt' => 'Commerce ou activité artisanale',
+                ],
+                'AGRI_ELEVAGE' => [
+                    'path' => 'images/credits/credit-agricole-elevage.jpg',
+                    'alt' => 'Activité agricole ou élevage',
+                ],
+                'SOCIAL_URGENCE' => [
+                    'path' => 'images/credits/credit-social-urgence.jpg',
+                    'alt' => 'Soutien à une dépense familiale urgente',
+                ],
+            ];
+        @endphp
+
+        <section class="flex flex-col gap-6" aria-label="Types de crédit">
             @forelse ($loanTypes as $type)
-                <article class="flex flex-col rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-                    <h2 class="text-xl font-semibold text-gray-900">{{ $type->name }}</h2>
-                    <p class="mt-3 flex-1 text-sm leading-6 text-gray-600">{{ $type->description }}</p>
-                    <dl class="mt-5 space-y-2 border-t border-gray-100 pt-4 text-sm">
-                        <div class="flex justify-between gap-3">
-                            <dt class="text-gray-500">Durée</dt>
-                            <dd class="text-right font-medium">{{ $type->min_duration_months }}–{{ $type->max_duration_months }} mois</dd>
-                        </div>
-                        <div class="flex justify-between gap-3">
-                            <dt class="text-gray-500">Remboursement</dt>
-                            <dd class="text-right font-medium">{{ collect($type->allowed_frequencies)->map(fn ($frequency) => ['weekly' => 'Hebdomadaire', 'biweekly' => 'Bimensuel', 'monthly' => 'Mensuel'][$frequency] ?? $frequency)->join(', ') }}</dd>
-                        </div>
-                        @if ($type->effective_max_amount !== null)
-                            <div class="flex justify-between gap-3">
-                                <dt class="text-gray-500">Plafond</dt>
-                                <dd class="text-right font-medium">{{ number_format($type->effective_max_amount, 0, ',', ' ') }} Ar</dd>
-                            </div>
+                @php($photo = $creditPhotos[$type->code] ?? null)
+                @php($photoExists = $photo && file_exists(public_path($photo['path'])))
+                <article class="grid overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm md:grid-cols-2">
+                    <div class="flex min-h-64 items-center justify-center bg-gray-100 md:min-h-full">
+                        @if ($photoExists)
+                            <img src="{{ asset($photo['path']) }}" alt="{{ $photo['alt'] }}" class="h-full min-h-64 w-full object-cover">
+                        @else
+                            <p class="px-6 text-center text-sm text-gray-500">
+                                Photo à ajouter :
+                                <code class="mt-2 block break-all text-xs text-gray-700">public/{{ $photo['path'] ?? 'images/credits/credit-' . \Illuminate\Support\Str::slug($type->name) . '.jpg' }}</code>
+                            </p>
                         @endif
-                        <div class="flex justify-between gap-3">
-                            <dt class="text-gray-500">Taux indicatif</dt>
-                            <dd class="text-right font-medium">{{ number_format($type->effective_default_interest_rate, 2, ',', ' ') }} % / mois</dd>
-                        </div>
-                    </dl>
-                    <a href="{{ auth()->check() && auth()->user()->role === 'client' ? url('/client/loans/create') : (auth()->check() ? route('home') : route('login')) }}"
-                       class="mt-6 inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
-                        {{ auth()->check() && auth()->user()->role === 'client' ? 'Demander ce crédit' : 'Contacter / se connecter' }}
-                    </a>
+                    </div>
+                    <div class="flex flex-col p-6 sm:p-8">
+                        <h2 class="text-xl font-semibold text-gray-900">{{ $type->name }}</h2>
+                        <p class="mt-3 flex-1 text-sm leading-6 text-gray-600">{{ $type->description }}</p>
+                        <dl class="mt-5 space-y-2 border-t border-gray-100 pt-4 text-sm">
+                            <div class="flex justify-between gap-3">
+                                <dt class="text-gray-500">Durée</dt>
+                                <dd class="text-right font-medium">{{ $type->min_duration_months }}–{{ $type->max_duration_months }} mois</dd>
+                            </div>
+                            <div class="flex justify-between gap-3">
+                                <dt class="text-gray-500">Remboursement</dt>
+                                <dd class="text-right font-medium">{{ collect($type->allowed_frequencies)->map(fn ($frequency) => ['weekly' => 'Hebdomadaire', 'biweekly' => 'Bimensuel', 'monthly' => 'Mensuel'][$frequency] ?? $frequency)->join(', ') }}</dd>
+                            </div>
+                            @if ($type->effective_max_amount !== null)
+                                <div class="flex justify-between gap-3">
+                                    <dt class="text-gray-500">Plafond</dt>
+                                    <dd class="text-right font-medium">{{ number_format($type->effective_max_amount, 0, ',', ' ') }} Ar</dd>
+                                </div>
+                            @endif
+                            <div class="flex justify-between gap-3">
+                                <dt class="text-gray-500">Taux indicatif</dt>
+                                <dd class="text-right font-medium">{{ number_format($type->effective_default_interest_rate, 2, ',', ' ') }} % / mois</dd>
+                            </div>
+                        </dl>
+                        <a href="{{ auth()->check() && auth()->user()->role === 'client' ? url('/client/loans/create') : (auth()->check() ? route('home') : route('login')) }}"
+                           class="mt-6 inline-flex min-h-11 items-center justify-center rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">
+                            {{ auth()->check() && auth()->user()->role === 'client' ? 'Demander ce crédit' : 'Contacter / se connecter' }}
+                        </a>
+                    </div>
                 </article>
             @empty
-                <p class="col-span-full rounded-xl bg-white p-6 text-center text-gray-500">Aucun type de crédit n’est disponible pour le moment.</p>
+                <p class="rounded-xl bg-white p-6 text-center text-gray-500">Aucun type de crédit n’est disponible pour le moment.</p>
             @endforelse
         </section>
 
