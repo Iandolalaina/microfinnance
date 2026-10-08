@@ -6,11 +6,14 @@
         <a href="{{ route('home') }}" class="text-sm text-gray-500 hover:text-brand-600">Accueil</a>
     </div>
 
-    {{-- En-tête avec nom du client et déconnexion --}}
-    <div class="flex items-center justify-between mb-6">
-        <div>
-            <p class="text-sm text-gray-500">Bonjour,</p>
-            <h1 class="text-lg font-semibold text-gray-900">{{ auth()->user()->name }}</h1>
+    {{-- En-tête avec photo du client et déconnexion --}}
+    <div class="mb-6 flex items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+            <x-profile-avatar :user="auth()->user()" class="h-16 w-16 text-lg" />
+            <div>
+                <p class="text-sm text-gray-500">Bonjour,</p>
+                <h1 class="text-lg font-semibold text-gray-900">{{ auth()->user()->name }}</h1>
+            </div>
         </div>
         <a href="{{ url('/client/loans/create') }}" class="rounded-lg bg-brand-600 px-3 py-2 text-xs font-semibold text-white hover:bg-brand-700">
             Demander un crédit

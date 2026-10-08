@@ -28,7 +28,10 @@ class MemberRegistrationTest extends TestCase
         $this->assertMatchesRegularExpression('/^MTS-\d{4}-\d{6}$/', $member->matricule);
         $response->assertSessionHas('member_matricule', $member->matricule);
         Storage::disk('public')->assertExists($member->profile_photo);
-        $this->get('/client/dashboard')->assertOk()->assertSee($member->matricule);
+        $this->get('/client/dashboard')
+            ->assertOk()
+            ->assertSee($member->matricule)
+            ->assertSee(Storage::disk('public')->url($member->profile_photo), false);
 
         $this->post(route('logout'))->assertRedirect('/login');
         $this->post('/login', [

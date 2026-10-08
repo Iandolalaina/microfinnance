@@ -18,7 +18,7 @@ class HomeCarouselTest extends TestCase
             ->assertSee('data-carousel-indicator="1"', false)
             ->assertSee('data-carousel-indicator="2"', false)
             ->assertSee('.carousel-navigation { position: absolute; left: 50%', false)
-            ->assertSee('width: 90%; height: clamp(288px, 49.6vw, 520px)', false)
+            ->assertSee('width: 100%; height: clamp(288px, 49.6vw, 520px)', false)
             ->assertSee('border-radius: 18px', false)
             ->assertDontSee('data-carousel-toggle', false);
     }

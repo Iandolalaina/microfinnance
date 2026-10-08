@@ -4,15 +4,21 @@
     <div class="sticky-page-header flex items-center justify-between">
         <div>
             <p class="text-brand-600 font-bold tracking-wide text-sm">MITSINJO — Espace Agent</p>
-            <h1 class="text-lg font-semibold text-gray-900 mt-1">
-                Bonjour, {{ auth()->user()->name }}
-                @if($zone)
-                    <span class="text-sm font-normal text-gray-500">· Zone : {{ $zone->name }}</span>
-                @endif
-            </h1>
+            <div class="mt-1 flex items-center gap-3">
+                <x-profile-avatar :user="auth()->user()" class="h-14 w-14 text-sm" />
+                <h1 class="text-lg font-semibold text-gray-900">
+                    Bonjour, {{ auth()->user()->name }}
+                    @if($zone)
+                        <span class="text-sm font-normal text-gray-500">· Zone : {{ $zone->name }}</span>
+                    @endif
+                </h1>
+            </div>
         </div>
         <div class="flex items-center gap-4">
             <a href="{{ route('home') }}" class="text-sm text-gray-500 hover:text-brand-600">Accueil</a>
+            <a href="{{ route('agent.users.index') }}" class="text-sm text-brand-600 hover:underline">
+                Gérer les clients
+            </a>
             <a href="{{ url('/agent/loans/create') }}" class="text-sm text-brand-600 hover:underline">
                 Octroyer un pret
             </a>

@@ -42,7 +42,7 @@ Route::middleware('auth')->group(function () {
     // ------------------------------------------------------------
     Route::middleware('role:admin')->group(function () {
         Route::get('/admin/dashboard', AdminDashboard::class);
-        Route::get('/admin/users', UserManagement::class);
+        Route::get('/admin/users', UserManagement::class)->name('admin.users.index');
         Route::get('/admin/announcements', AnnouncementForm::class);
         Route::get('/admin/loans/create', LoanCreate::class);
     });
@@ -52,6 +52,7 @@ Route::middleware('auth')->group(function () {
     // ------------------------------------------------------------
     Route::middleware('role:agent')->group(function () {
         Route::get('/agent/dashboard', AgentDashboard::class);
+        Route::get('/agent/users', UserManagement::class)->name('agent.users.index');
         Route::get('/agent/loans/create', LoanCreate::class);
         Route::get('/agent/manual-payment/{schedule}', ManualPayment::class);
         Route::get('/agent/manual-loan-payment/{schedule}', ManualLoanPayment::class);

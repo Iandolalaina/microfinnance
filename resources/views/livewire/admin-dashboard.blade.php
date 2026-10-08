@@ -4,7 +4,10 @@
     <div class="sticky-page-header flex items-center justify-between">
         <div>
             <p class="text-brand-600 font-bold tracking-wide text-sm">MITSINJO — Administration</p>
-            <h1 class="text-lg font-semibold text-gray-900 mt-1">Bonjour, {{ auth()->user()->name }}</h1>
+            <div class="mt-1 flex items-center gap-3">
+                <x-profile-avatar :user="auth()->user()" class="h-14 w-14 text-sm" />
+                <h1 class="text-lg font-semibold text-gray-900">Bonjour, {{ auth()->user()->name }}</h1>
+            </div>
         </div>
         <div class="flex items-center gap-4">
             <a href="{{ route('home') }}" class="text-sm text-gray-500 hover:text-brand-600">Accueil</a>

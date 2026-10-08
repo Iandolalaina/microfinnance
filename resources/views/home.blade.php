@@ -40,7 +40,7 @@
         .eyebrow::before { width: 24px; height: 2px; background: var(--mitsinjo-gold); content: ''; }
         h1, h2, h3, p { margin-top: 0; }
         .hero { width: 100%; }
-        .hero-carousel { position: relative; width: 90%; height: clamp(288px, 49.6vw, 520px); margin: 0 auto; overflow: hidden; border-radius: 18px; background: #e7ede8; }
+        .hero-carousel { position: relative; width: 100%; height: clamp(288px, 49.6vw, 520px); margin: 0 auto; overflow: hidden; border-radius: 18px; background: #e7ede8; }
         .carousel-slide { position: absolute; inset: 0; }
         .carousel-slide[hidden] { display: none; }
         .carousel-slide img { width: 100%; height: 100%; border-radius: inherit; object-fit: cover; }
