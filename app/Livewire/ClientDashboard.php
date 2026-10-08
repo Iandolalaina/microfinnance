@@ -42,6 +42,12 @@ class ClientDashboard extends Component
                 ? $loan->loanSchedules()->orderBy('due_date')->get()
                 : $loan->schedules()->orderBy('due_date')->get())
             : collect();
+        $interestAmount = $loan
+            ? max(
+                0,
+                ((float) $loan->total_repayable ?: (float) $schedules->sum('amount_due')) - (float) $loan->amount
+            )
+            : 0;
 
         $announcements = Announcement::visibleTo(auth()->user())
             ->whereNotNull('published_at')
@@ -55,6 +61,7 @@ class ClientDashboard extends Component
             'pendingLoan' => $pendingLoan,
             'rejectedLoan' => $rejectedLoan,
             'schedules' => $schedules,
+            'interestAmount' => $interestAmount,
             'announcements' => $announcements,
         ]);
     }

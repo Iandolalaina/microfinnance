@@ -9,10 +9,13 @@ use App\Models\User;
 use App\Models\Zone;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 #[Layout('components.layout')]
 class AdminDashboard extends Component
 {
+    use WithPagination;
+
     public function render()
     {
         // Chiffres globaux sur toute l'ONG
@@ -40,6 +43,10 @@ class AdminDashboard extends Component
             ->where('status', 'pending')
             ->latest()
             ->get();
+        $activeLoans = Loan::with(['client', 'type', 'loanSchedules', 'schedules'])
+            ->where('status', 'active')
+            ->latest()
+            ->paginate(10);
 
         return view('livewire.admin-dashboard', [
             'totalClients' => $totalClients,
@@ -50,6 +57,7 @@ class AdminDashboard extends Component
             'stats' => $stats,
             'zones' => $zones,
             'pendingLoans' => $pendingLoans,
+            'activeLoans' => $activeLoans,
         ]);
     }
 }

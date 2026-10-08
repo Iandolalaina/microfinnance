@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\User;
 use App\Models\Zone;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -11,53 +12,84 @@ use Livewire\Component;
 class UserManagement extends Component
 {
     public string $name = '';
+
     public string $phone = '';
+
     public string $password = '';
+
     public string $role = 'client';
+
     public ?int $zoneId = null;
 
     public bool $showForm = false;
 
-    /**
-     * Affiche ou cache le formulaire de création (évite d'avoir
-     * une 2e page séparée pour un simple formulaire).
-     */
+    public ?int $editingUserId = null;
+
     public function toggleForm(): void
     {
+        $this->authorizeAdmin();
+        $this->resetForm();
         $this->showForm = ! $this->showForm;
     }
 
     public function create(): void
     {
-        $this->validate([
-            'name' => ['required', 'string', 'max:150'],
-            'phone' => ['required', 'string', 'unique:users,phone'],
-            'password' => ['required', 'string', 'min:6'],
-            'role' => ['required', 'in:admin,agent,client'],
-        ], [
-            'phone.unique' => 'Ce numéro de téléphone est déjà utilisé.',
-            'password.min' => 'Le mot de passe doit contenir au moins 6 caractères.',
-        ]);
+        $this->authorizeAdmin();
+        $validated = $this->validate($this->rules(), $this->messages());
 
         User::create([
-            'name' => $this->name,
-            'phone' => $this->phone,
-            'password' => bcrypt($this->password),
-            'role' => $this->role,
-            'zone_id' => $this->zoneId,
+            'name' => $validated['name'],
+            'phone' => $validated['phone'],
+            'password' => $this->password,
+            'role' => $validated['role'],
+            'zone_id' => $validated['zoneId'],
         ]);
 
-        $this->reset(['name', 'phone', 'password', 'role', 'zoneId']);
-        $this->showForm = false;
+        $this->resetForm();
     }
 
-    /**
-     * Active ou désactive un compte (au lieu de le supprimer, on garde
-     * son historique intact — voir la colonne is_active de la migration).
-     */
+    public function edit(int $userId): void
+    {
+        $this->authorizeAdmin();
+        $user = User::findOrFail($userId);
+
+        $this->editingUserId = $user->id;
+        $this->name = $user->name;
+        $this->phone = $user->phone;
+        $this->password = '';
+        $this->role = $user->role;
+        $this->zoneId = $user->zone_id;
+        $this->showForm = true;
+        $this->resetValidation();
+    }
+
+    public function update(): void
+    {
+        $this->authorizeAdmin();
+        $user = User::findOrFail($this->editingUserId);
+        $validated = $this->validate($this->rules($user), $this->messages());
+
+        if ($user->id === auth()->id() && $validated['role'] !== 'admin') {
+            $this->addError('role', 'Vous ne pouvez pas modifier votre propre rôle administrateur.');
+
+            return;
+        }
+
+        $user->update([
+            'name' => $validated['name'],
+            'phone' => $validated['phone'],
+            'role' => $validated['role'],
+            'zone_id' => $validated['zoneId'],
+            ...($this->password !== '' ? ['password' => $this->password] : []),
+        ]);
+
+        $this->resetForm();
+    }
+
     public function toggleActive(User $user): void
     {
-        // Sécurité : un admin ne peut pas se désactiver lui-même par erreur
+        $this->authorizeAdmin();
+
         if ($user->id === auth()->id()) {
             return;
         }
@@ -67,9 +99,42 @@ class UserManagement extends Component
 
     public function render()
     {
+        $this->authorizeAdmin();
+
         return view('livewire.user-management', [
             'users' => User::orderBy('role')->orderBy('name')->get(),
             'zones' => Zone::orderBy('name')->get(),
         ]);
+    }
+
+    private function rules(?User $user = null): array
+    {
+        return [
+            'name' => ['required', 'string', 'max:150'],
+            'phone' => ['required', 'string', 'max:20', Rule::unique('users', 'phone')->ignore($user)],
+            'password' => [$user ? 'nullable' : 'required', 'string', 'min:6'],
+            'role' => ['required', 'in:admin,agent,client'],
+            'zoneId' => ['nullable', 'integer', 'exists:zones,id'],
+        ];
+    }
+
+    private function messages(): array
+    {
+        return [
+            'phone.unique' => 'Ce numéro de téléphone est déjà utilisé.',
+            'password.min' => 'Le mot de passe doit contenir au moins 6 caractères.',
+        ];
+    }
+
+    private function authorizeAdmin(): void
+    {
+        abort_unless(auth()->user()?->isAdmin(), 403);
+    }
+
+    private function resetForm(): void
+    {
+        $this->reset(['name', 'phone', 'password', 'role', 'zoneId', 'editingUserId']);
+        $this->showForm = false;
+        $this->resetValidation();
     }
 }

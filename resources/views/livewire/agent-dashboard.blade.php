@@ -1,7 +1,7 @@
 <div class="max-w-4xl mx-auto px-4 py-6 pb-16">
 
     {{-- En-tête --}}
-    <div class="flex items-center justify-between mb-6">
+    <div class="sticky-page-header flex items-center justify-between">
         <div>
             <p class="text-brand-600 font-bold tracking-wide text-sm">MITSINJO — Espace Agent</p>
             <h1 class="text-lg font-semibold text-gray-900 mt-1">
@@ -84,7 +84,22 @@
                 @if (! $loan)
                     <p class="text-sm text-gray-400 mt-2">Aucun crédit actif</p>
                 @else
-                    @php $next = $loan->nextSchedule(); @endphp
+                    @php
+                        $next = $loan->nextSchedule();
+                        $loanSchedules = $loan->loanSchedules->isNotEmpty() ? $loan->loanSchedules : $loan->schedules;
+                        $repayableAmount = (float) $loan->total_repayable ?: (float) $loanSchedules->sum('amount_due');
+                        $interestAmount = max(0, $repayableAmount - (float) $loan->amount);
+                    @endphp
+                    <div class="mt-2 grid grid-cols-2 gap-2 border-t border-gray-100 pt-3 text-xs">
+                        <p class="text-gray-500">
+                            Montant du prêt :
+                            <span class="font-semibold text-gray-800">{{ number_format($loan->amount, 0, ',', ' ') }} Ar</span>
+                        </p>
+                        <p class="text-gray-500">
+                            Intérêts ({{ number_format($loan->interest_rate, 2, ',', ' ') }} %) :
+                            <span class="font-semibold text-gray-800">{{ number_format($interestAmount, 0, ',', ' ') }} Ar</span>
+                        </p>
+                    </div>
                     <div class="flex items-center justify-between mt-2">
                         <div class="text-sm text-gray-500">
                             Reste à payer :
@@ -118,6 +133,32 @@
                                 </a>
                             </div>
                         @endif
+                    </div>
+                    <div class="mt-3 border-t border-gray-100 pt-3">
+                        <h3 class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Échéances et intérêts</h3>
+                        <div class="space-y-2">
+                            @forelse ($loanSchedules->sortBy('due_date') as $schedule)
+                                <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+                                    <span class="text-gray-700">{{ $schedule->due_date->translatedFormat('d F Y') }}</span>
+                                    <span class="text-gray-600">
+                                        {{ number_format($schedule->amount_due, 0, ',', ' ') }} Ar
+                                        @if ($schedule instanceof \App\Models\LoanSchedule)
+                                            · intérêts : {{ number_format($schedule->interest_due, 0, ',', ' ') }} Ar
+                                        @endif
+                                    </span>
+                                    <span class="font-medium text-gray-500">
+                                        {{ match ($schedule->effective_status) {
+                                            'paid' => 'Payée',
+                                            'late' => 'En retard',
+                                            'partial' => 'Partielle',
+                                            default => 'En attente',
+                                        } }}
+                                    </span>
+                                </div>
+                            @empty
+                                <p class="text-xs text-gray-500">Aucune échéance enregistrée.</p>
+                            @endforelse
+                        </div>
                     </div>
                 @endif
             </div>

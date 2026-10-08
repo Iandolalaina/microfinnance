@@ -1,7 +1,7 @@
 <div class="max-w-md mx-auto px-4 py-6 pb-24">
 
     {{-- Bandeau de marque --}}
-    <div class="flex items-center justify-between mb-4">
+    <div class="sticky-page-header flex items-center justify-between">
         <p class="text-brand-600 font-bold tracking-wide text-sm">MITSINJO</p>
         <a href="{{ route('home') }}" class="text-sm text-gray-500 hover:text-brand-600">Accueil</a>
     </div>
@@ -102,6 +102,14 @@
                     <p class="text-brand-100 text-xs mb-0.5">Déjà remboursé</p>
                     <p class="font-semibold">{{ number_format($loan->total_paid, 0, ',', ' ') }} Ar</p>
                 </div>
+                <div>
+                    <p class="text-brand-100 text-xs mb-0.5">Intérêts totaux</p>
+                    <p class="font-semibold">{{ number_format($interestAmount, 0, ',', ' ') }} Ar</p>
+                </div>
+                <div>
+                    <p class="text-brand-100 text-xs mb-0.5">Taux d’intérêt</p>
+                    <p class="font-semibold">{{ number_format($loan->interest_rate, 2, ',', ' ') }} %</p>
+                </div>
             </div>
         </div>
 
@@ -141,6 +149,11 @@
                         <p class="text-xs text-gray-500">
                             {{ number_format($schedule->amount_due, 0, ',', ' ') }} Ar
                         </p>
+                        @if ($schedule instanceof \App\Models\LoanSchedule)
+                            <p class="text-xs text-gray-500">
+                                dont {{ number_format($schedule->interest_due, 0, ',', ' ') }} Ar d’intérêts
+                            </p>
+                        @endif
                     </div>
 
                     {{-- Badge de statut coloré selon l'état de l'échéance --}}

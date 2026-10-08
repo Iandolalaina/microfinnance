@@ -9,7 +9,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="min-h-screen bg-gray-50 text-gray-800">
-    <header class="border-b border-gray-100 bg-white">
+    <header class="sticky top-0 z-50 border-b border-gray-100 bg-white">
         <nav class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4" aria-label="Navigation principale">
             <a href="{{ route('home') }}" class="font-bold tracking-wide text-brand-600">MITSINJO</a>
             <div class="flex items-center gap-4 text-sm">

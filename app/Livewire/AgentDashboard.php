@@ -18,7 +18,7 @@ class AgentDashboard extends Component
         // avec leur prêt actif et les échéances de ce prêt (en une seule
         // requête optimisée grâce à "with" — évite le problème dit "N+1").
         $clients = User::where('role', 'client')
-            ->when($agent->zone_id, fn ($q) => $q->where('zone_id', $agent->zone_id))
+            ->where('zone_id', $agent->zone_id)
             ->with(['loans' => function ($query) {
                 $query->where('status', 'active')->with(['schedules', 'loanSchedules']);
             }])

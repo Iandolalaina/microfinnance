@@ -1,6 +1,6 @@
 <div class="max-w-3xl mx-auto px-4 py-6 pb-16">
 
-    <div class="flex items-center justify-between mb-6">
+    <div class="sticky-page-header flex items-center justify-between">
         <div>
             <p class="text-brand-600 font-bold tracking-wide text-sm">MITSINJO — Utilisateurs</p>
             <h1 class="text-lg font-semibold text-gray-900 mt-1">Gestion des comptes</h1>
@@ -11,7 +11,6 @@
         </div>
     </div>
 
-    {{-- Bouton pour ouvrir/fermer le formulaire de création --}}
     <button
         wire:click="toggleForm"
         class="mb-4 text-sm bg-brand-600 hover:bg-brand-700 text-white font-medium px-4 py-2.5 rounded-xl"
@@ -21,7 +20,10 @@
 
     @if ($showForm)
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
-            <form wire:submit="create" class="space-y-4">
+            <h2 class="mb-4 text-sm font-semibold text-gray-900">
+                {{ $editingUserId ? 'Modifier un utilisateur' : 'Créer un utilisateur' }}
+            </h2>
+            <form wire:submit="{{ $editingUserId ? 'update' : 'create' }}" class="space-y-4">
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Nom complet</label>
@@ -38,8 +40,10 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Mot de passe</label>
-                    <input type="password" wire:model="password"
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                        Mot de passe {{ $editingUserId ? '(laisser vide pour ne pas le modifier)' : '' }}
+                    </label>
+                    <input type="password" wire:model="password" autocomplete="new-password"
                         class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500">
                     @error('password') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
@@ -63,20 +67,20 @@
                             <option value="{{ $zone->id }}">{{ $zone->name }}</option>
                         @endforeach
                     </select>
+                    @error('zoneId') <p class="text-red-600 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
                 <button type="submit" wire:loading.attr="disabled"
                     class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium py-3 rounded-xl disabled:opacity-60">
-                    Créer le compte
+                    {{ $editingUserId ? 'Enregistrer les modifications' : 'Créer le compte' }}
                 </button>
             </form>
         </div>
     @endif
 
-    {{-- Liste des utilisateurs --}}
     <div class="space-y-2">
         @foreach ($users as $user)
-            <div class="bg-white rounded-xl border border-gray-100 p-4 flex items-center justify-between">
+            <div wire:key="managed-user-{{ $user->id }}" class="bg-white rounded-xl border border-gray-100 p-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
                     <p class="text-sm font-medium text-gray-900">{{ $user->name }}</p>
                     <p class="text-xs text-gray-400">{{ $user->phone }}</p>
@@ -94,13 +98,21 @@
                         {{ ucfirst($user->role) }}
                     </span>
 
+                    <span class="text-xs font-medium px-2.5 py-1 rounded-full
+                           {{ $user->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
+                        {{ $user->is_active ? 'Actif' : 'Désactivé' }}
+                    </span>
+                    <button wire:click="edit({{ $user->id }})"
+                        class="text-xs font-medium text-brand-600 hover:underline">
+                        Modifier
+                    </button>
                     @if ($user->id !== auth()->id())
                         <button
                             wire:click="toggleActive({{ $user->id }})"
-                            class="text-xs font-medium px-2.5 py-1 rounded-full
-                                   {{ $user->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}"
+                            wire:confirm="{{ $user->is_active ? 'Désactiver ce compte ? Son historique sera conservé.' : 'Réactiver ce compte ?' }}"
+                            class="text-xs font-medium {{ $user->is_active ? 'text-red-600' : 'text-green-700' }}"
                         >
-                            {{ $user->is_active ? 'Actif' : 'Désactivé' }}
+                            {{ $user->is_active ? 'Désactiver' : 'Réactiver' }}
                         </button>
                     @endif
                 </div>

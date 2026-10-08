@@ -16,8 +16,8 @@
         html { scroll-behavior: smooth; }
         body { margin: 0; color: var(--mitsinjo-ink); font-family: 'DM Sans', sans-serif; }
         a { color: inherit; text-decoration: none; }
-        .site-shell { overflow: hidden; }
-        .site-header { position: relative; z-index: 2; background: #fff; border-bottom: 1px solid #e7ede8; }
+        .site-shell { overflow: clip; }
+        .site-header { position: sticky; top: 0; z-index: 50; background: #fff; border-bottom: 1px solid #e7ede8; }
         .site-nav { width: min(1160px, calc(100% - 48px)); min-height: 82px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 28px; }
         .brand { display: inline-flex; align-items: center; gap: 12px; flex: 0 0 auto; }
         .brand img { width: 48px; height: 48px; object-fit: contain; }
@@ -40,21 +40,21 @@
         .eyebrow::before { width: 24px; height: 2px; background: var(--mitsinjo-gold); content: ''; }
         h1, h2, h3, p { margin-top: 0; }
         .hero { width: 100%; }
-        .hero-carousel { position: relative; width: 100%; height: clamp(360px, 62vw, 650px); overflow: hidden; background: #e7ede8; }
+        .hero-carousel { position: relative; width: 90%; height: clamp(288px, 49.6vw, 520px); margin: 0 auto; overflow: hidden; border-radius: 18px; background: #e7ede8; }
         .carousel-slide { position: absolute; inset: 0; }
         .carousel-slide[hidden] { display: none; }
-        .carousel-slide img { width: 100%; height: 100%; object-fit: cover; }
+        .carousel-slide img { width: 100%; height: 100%; border-radius: inherit; object-fit: cover; }
         .carousel-placeholder { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; padding: 24px; color: #4f615a; background: linear-gradient(135deg, #edf3ef, #dce7df); text-align: center; }
         .carousel-placeholder code { display: block; margin-top: 10px; color: var(--mitsinjo-blue); font-size: 14px; }
         .carousel-controls { position: absolute; right: 20px; bottom: 20px; left: 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-        .carousel-arrow, .carousel-toggle, .carousel-indicator { display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; border: 1px solid rgb(255 255 255 / 70%); border-radius: 4px; color: #fff; background: rgb(24 43 53 / 68%); cursor: pointer; }
+        .carousel-arrow, .carousel-indicator { display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: center; border: 1px solid rgb(255 255 255 / 70%); border-radius: 4px; color: #fff; background: rgb(24 43 53 / 68%); cursor: pointer; }
         .carousel-arrow { font-size: 24px; }
-        .carousel-navigation { display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .carousel-indicator { min-width: 34px; min-height: 34px; border-radius: 50%; font-size: 12px; }
-        .carousel-indicator[aria-current="true"] { color: var(--mitsinjo-ink); background: #fff; }
-        .carousel-toggle { padding: 0 12px; font-size: 12px; font-weight: 600; }
-        .carousel-arrow:hover, .carousel-toggle:hover, .carousel-indicator:hover { background: var(--mitsinjo-blue); }
-        .carousel-arrow:focus-visible, .carousel-toggle:focus-visible, .carousel-indicator:focus-visible { outline: 3px solid #f4c65c; outline-offset: 3px; }
+        .carousel-navigation { position: absolute; left: 50%; display: flex; align-items: center; justify-content: center; gap: 8px; transform: translateX(-50%); }
+        .carousel-indicator { min-width: 30px; min-height: 30px; border: 0; border-radius: 50%; background: transparent; }
+        .carousel-indicator::before { width: 9px; height: 9px; border-radius: 50%; background: rgb(255 255 255 / 70%); content: ''; }
+        .carousel-indicator[aria-current="true"]::before { background: #fff; transform: scale(1.35); }
+        .carousel-arrow:hover, .carousel-indicator:hover { background: var(--mitsinjo-blue); }
+        .carousel-arrow:focus-visible, .carousel-indicator:focus-visible { outline: 3px solid #f4c65c; outline-offset: 3px; }
         .intro { width: min(1160px, calc(100% - 48px)); margin: auto; padding: 74px 0 66px; display: grid; grid-template-columns: .72fr 1fr; gap: 80px; align-items: start; }
         .intro h2, .impact-copy h2 { margin: 13px 0 0; color: var(--mitsinjo-green); font-family: 'Lora', serif; font-size: 34px; line-height: 1.2; }
         .intro p { margin: 0; color: #63716c; font-size: 15px; line-height: 1.9; }
@@ -84,11 +84,11 @@
             .mobile-services .services-dropdown { position: static; display: flex; gap: 8px; margin-top: 8px; padding: 0; border: 0; box-shadow: none; }
             .mobile-services .services-dropdown a { padding: 8px 12px; background: #edf3ef; }
             .nav-cta { min-height: 40px; padding: 0 14px; font-size: 12px; }
-            .hero-carousel { height: 62vh; min-height: 300px; max-height: 520px; }
+            .hero-carousel { height: 49.6vh; min-height: 240px; max-height: 416px; }
             .carousel-controls { right: 12px; bottom: 12px; left: 12px; gap: 8px; }
-            .carousel-arrow, .carousel-toggle { min-width: 40px; min-height: 40px; }
+            .carousel-arrow { min-width: 40px; min-height: 40px; }
             .carousel-navigation { gap: 5px; }
-            .carousel-indicator { min-width: 32px; min-height: 32px; }
+            .carousel-indicator { min-width: 28px; min-height: 28px; }
             .intro { width: min(100% - 36px, 620px); grid-template-columns: 1fr; gap: 22px; padding: 56px 0; }
             .intro h2, .impact-copy h2 { font-size: 29px; }
             .impact-inner, .footer-inner { width: min(100% - 36px, 620px); }
@@ -163,10 +163,9 @@
                     <button class="carousel-arrow" type="button" data-carousel-previous aria-label="Photo précédente">‹</button>
                     <div class="carousel-navigation" aria-label="Choisir une photo">
                         @foreach ($homeSlides as $index => $slide)
-                            <button class="carousel-indicator" type="button" data-carousel-indicator="{{ $index }}" aria-label="Afficher la photo {{ $index + 1 }}" aria-current="{{ $index === 0 ? 'true' : 'false' }}">{{ $index + 1 }}</button>
+                            <button class="carousel-indicator" type="button" data-carousel-indicator="{{ $index }}" aria-label="Afficher la photo {{ $index + 1 }}" aria-current="{{ $index === 0 ? 'true' : 'false' }}"></button>
                         @endforeach
                     </div>
-                    <button class="carousel-toggle" type="button" data-carousel-toggle aria-label="Mettre le défilement en pause">Pause</button>
                     <button class="carousel-arrow" type="button" data-carousel-next aria-label="Photo suivante">›</button>
                 </div>
             </div>
@@ -203,7 +202,6 @@
 
         const slides = [...carousel.querySelectorAll('[data-carousel-slide]')];
         const indicators = [...carousel.querySelectorAll('[data-carousel-indicator]')];
-        const toggle = carousel.querySelector('[data-carousel-toggle]');
         const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         let currentSlide = 0;
         let timer;
@@ -247,12 +245,6 @@
                 startRotation();
             });
         });
-        toggle.addEventListener('click', () => {
-            paused = !paused;
-            toggle.textContent = paused ? 'Reprendre' : 'Pause';
-            toggle.setAttribute('aria-label', paused ? 'Reprendre le défilement' : 'Mettre le défilement en pause');
-            startRotation();
-        });
         carousel.addEventListener('mouseenter', () => {
             hovered = true;
             stopRotation();
@@ -276,7 +268,6 @@
             else startRotation();
         });
 
-        toggle.textContent = paused ? 'Reprendre' : 'Pause';
         startRotation();
     })();
 </script>

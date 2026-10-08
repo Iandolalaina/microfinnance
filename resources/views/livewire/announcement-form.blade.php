@@ -6,7 +6,7 @@
         $dashboardUrl = $isAdmin ? url('/admin/dashboard') : url('/agent/dashboard');
     @endphp
 
-    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
+    <div class="sticky-page-header flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <p class="text-brand-600 font-bold tracking-wide text-sm">MITSINJO - Annonces</p>
             <h1 class="text-lg font-semibold text-gray-900 mt-1">

@@ -1,5 +1,5 @@
 <div class="mx-auto max-w-3xl px-4 py-8">
-    <div class="mb-6 flex items-center justify-between">
+    <div class="sticky-page-header flex items-center justify-between">
         <div>
             <p class="text-sm font-bold tracking-wide text-brand-600">MITSINJO — Crédit</p>
             <h1 class="mt-1 text-xl font-semibold text-gray-900">Demander un crédit</h1>

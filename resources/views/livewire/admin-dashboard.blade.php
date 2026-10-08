@@ -1,7 +1,7 @@
 <div class="max-w-4xl mx-auto px-4 py-6 pb-16">
 
     {{-- En-tête --}}
-    <div class="flex items-center justify-between mb-6">
+    <div class="sticky-page-header flex items-center justify-between">
         <div>
             <p class="text-brand-600 font-bold tracking-wide text-sm">MITSINJO — Administration</p>
             <h1 class="text-lg font-semibold text-gray-900 mt-1">Bonjour, {{ auth()->user()->name }}</h1>
@@ -43,6 +43,64 @@
                 <p class="rounded-xl bg-white p-4 text-sm text-gray-500">Aucune demande en attente.</p>
             @endforelse
         </div>
+    </section>
+
+    <section class="mb-8" aria-labelledby="active-loans-heading">
+        <h2 id="active-loans-heading" class="mb-3 text-sm font-semibold text-gray-700">
+            Dossiers de crédit en cours ({{ $activeLoans->total() }})
+        </h2>
+        <div class="space-y-3">
+            @forelse ($activeLoans as $loan)
+                @php
+                    $loanSchedules = $loan->loanSchedules->isNotEmpty() ? $loan->loanSchedules : $loan->schedules;
+                    $repayableAmount = (float) $loan->total_repayable ?: (float) $loanSchedules->sum('amount_due');
+                    $interestAmount = max(0, $repayableAmount - (float) $loan->amount);
+                @endphp
+                <article wire:key="admin-active-loan-{{ $loan->id }}" class="rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+                    <div class="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                            <p class="font-semibold text-gray-900">{{ $loan->client->name }} — {{ $loan->type?->name ?? 'Crédit' }}</p>
+                            <p class="mt-1 text-sm text-gray-600">
+                                Prêt : {{ number_format($loan->amount, 0, ',', ' ') }} Ar ·
+                                Intérêts : {{ number_format($interestAmount, 0, ',', ' ') }} Ar
+                                ({{ number_format($loan->interest_rate, 2, ',', ' ') }} %)
+                            </p>
+                            <p class="mt-1 text-sm text-gray-600">Reste à payer : {{ number_format($loan->remaining_amount, 0, ',', ' ') }} Ar</p>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 border-t border-gray-100 pt-3">
+                        <h3 class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Dates d’échéance</h3>
+                        <div class="space-y-2">
+                            @forelse ($loanSchedules->sortBy('due_date') as $schedule)
+                                <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
+                                    <span class="text-gray-700">{{ $schedule->due_date->translatedFormat('d F Y') }}</span>
+                                    <span class="text-gray-600">
+                                        {{ number_format($schedule->amount_due, 0, ',', ' ') }} Ar
+                                        @if ($schedule instanceof \App\Models\LoanSchedule)
+                                            · intérêts : {{ number_format($schedule->interest_due, 0, ',', ' ') }} Ar
+                                        @endif
+                                    </span>
+                                    <span class="font-medium text-gray-500">
+                                        {{ match ($schedule->effective_status) {
+                                            'paid' => 'Payée',
+                                            'late' => 'En retard',
+                                            'partial' => 'Partielle',
+                                            default => 'En attente',
+                                        } }}
+                                    </span>
+                                </div>
+                            @empty
+                                <p class="text-xs text-gray-500">Aucune échéance enregistrée.</p>
+                            @endforelse
+                        </div>
+                    </div>
+                </article>
+            @empty
+                <p class="rounded-xl bg-white p-4 text-sm text-gray-500">Aucun crédit en cours.</p>
+            @endforelse
+        </div>
+        <div class="mt-4">{{ $activeLoans->links() }}</div>
     </section>
 
     {{-- KPIs financiers globaux --}}
